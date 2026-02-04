@@ -18,11 +18,6 @@ type Link struct {
 	UserID string
 }
 
-type apiConfig struct {
-	port string
-	db   *gorm.DB
-}
-
 func main() {
 
 	if err := godotenv.Load(); err != nil {
@@ -31,7 +26,7 @@ func main() {
 
 	// Get enviroment variables
 	dbUrl := os.Getenv("DB_STRING")
-	port := os.Getenv("API_PORT")
+	port := os.Getenv("PORT")
 
 	// Setup services
 	app := fiber.New()

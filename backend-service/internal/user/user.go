@@ -22,6 +22,9 @@ func Register(app *fiber.App, db *gorm.DB) {
 	service := NewService(repository)
 	handler := NewHandler(service)
 
+	app.Post("/users", handler.Register)
 	app.Get("/users", handler.GetAll)
-	app.Post("/users", handler.Create)
+	app.Get("/users/:id", handler.FindById)
+	app.Put("/users/:id", handler.UpdateById)
+	app.Delete("/users/:id", handler.DeleteById)
 }

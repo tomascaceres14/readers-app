@@ -1,0 +1,22 @@
+meta {
+  name: update user
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{host}}/users/c14b107e-5eac-43ef-b34f-50a8d0a3aa60
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "username": "cazaFANTASMAS:P"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

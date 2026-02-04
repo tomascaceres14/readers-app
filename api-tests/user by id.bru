@@ -1,0 +1,16 @@
+meta {
+  name: user by id
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{host}}/users/d744a191-05a9-4fb9-b05b-54c4997e4ff0
+  body: formUrlEncoded
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

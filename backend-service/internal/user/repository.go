@@ -14,27 +14,31 @@ func NewRepository(db *gorm.DB) *Repository {
 }
 
 func (r *Repository) FindAll() ([]User, error) {
-	var Users []User
-	if err := r.db.Find(Users).Error; err != nil {
+	var users []User
+	if err := r.db.Find(&users).Error; err != nil {
 		return nil, err
 	}
 
-	return Users, nil
+	return users, nil
 }
 
-func (r *Repository) FindByID(id uuid.UUID) (User, error) {
+func (r *Repository) FindById(id uuid.UUID) (*User, error) {
 	var user User
 	if err := r.db.First(&user, "id = ?", id).Error; err != nil {
-		return User{}, err
+		return nil, err
 	}
 
-	return user, nil
+	return &user, nil
 }
 
-func (r *Repository) Save(user User) (uuid.UUID, error) {
-	if err := r.db.Create(user).Error; err != nil {
-		return uuid.Nil, err
-	}
+func (r *Repository) Register(user *User) error {
+	return r.db.Create(user).Error
+}
 
-	return user.ID, nil
+func (r *Repository) Update(user *User) error {
+	return r.db.Save(user).Error
+}
+
+func (r *Repository) Delete(user *User) {
+	r.db.Delete(user)
 }
