@@ -1,0 +1,30 @@
+# Raíz del servicio
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  # Comando que Air usa para compilar
+  cmd = "go build -o ./tmp/app ./cmd/main.go"
+
+  # Binario que Air va a ejecutar
+  bin = "tmp/app"
+
+  # Archivos a observar
+  include_ext = ["go"]
+  exclude_dir = ["tmp", "vendor"]
+
+  # Delay chico para evitar rebuilds múltiples
+  delay = 1000
+
+  # Señal correcta para apagar el proceso
+  kill_signal = "SIGINT"
+  send_interrupt = true
+
+[log]
+  time = true
+
+[color]
+  main = "cyan"
+  watcher = "yellow"
+  build = "green"
+  runner = "magenta"
