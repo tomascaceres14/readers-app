@@ -38,5 +38,6 @@ tmp/*
 
 # React
 node_modules/
-frontend/package-lock.json
+package-lock.json
 *.env*
+*/tmp/*

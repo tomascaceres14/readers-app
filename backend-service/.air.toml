@@ -4,13 +4,14 @@ tmp_dir = "tmp"
 
 [build]
   # Comando que Air usa para compilar
-  cmd = "go build -o ./tmp/app ./cmd/main.go"
+  cmd = "templ generate && go build -o ./tmp/app ./cmd/main.go"
 
   # Binario que Air va a ejecutar
   bin = "tmp/app"
 
   # Archivos a observar
-  include_ext = ["go"]
+  include_ext = ["go", "templ", "html", "css"]
+  exclude_regex = ["_templ\\.go"]
   exclude_dir = ["tmp", "vendor"]
 
   # Delay chico para evitar rebuilds múltiples

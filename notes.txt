@@ -3,3 +3,4 @@ Implement Oauth Firebase Authentication
 
 
 2. React.... :(
+▶ npx @tailwindcss/cli -i ./input.css -o ./static/css/output.css --watch
