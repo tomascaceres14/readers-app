@@ -39,3 +39,4 @@ tmp/*
 # React
 node_modules/
 frontend/package-lock.json
+*.env*
