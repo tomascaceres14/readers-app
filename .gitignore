@@ -35,3 +35,7 @@ go.work.sum
 
 # TMP
 tmp/*
+
+# React
+node_modules/
+frontend/package-lock.json

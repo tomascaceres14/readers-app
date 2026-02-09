@@ -1,0 +1,5 @@
+1. Security
+Implement Oauth Firebase Authentication
+
+
+2. React.... :(
