@@ -4,7 +4,7 @@ A personal project designed to combat information overload and create a focused,
 
 ## The Problem
 
-Ever come across a fascinating blog post, a critical technical article, or a brilliant tutorial, only to lose it in a sea of bookmarks? It's hard to retain and cross-reference information scattered across the web.
+It's difficult and time consuming to organice, keep track and mantain a centralized point of access for all the blog posts, articles, tutorials and reading material that you come across in the internet.
 
 ## The Solution
 
