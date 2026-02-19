@@ -17,12 +17,12 @@ type User struct {
 	UpdatedAt time.Time
 }
 
-func Register(app *fiber.App, db *gorm.DB) {
+func Initialize(app *fiber.App, db *gorm.DB) {
 	repository := NewRepository(db)
 	service := NewService(repository)
 	handler := NewHandler(service)
 
-	app.Post("/users", handler.Register)
+	app.Post("/users", handler.Create)
 	app.Get("/users", handler.GetAll)
 	app.Get("/users/:id", handler.FindById)
 	app.Put("/users/:id", handler.UpdateById)

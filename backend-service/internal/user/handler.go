@@ -33,7 +33,7 @@ func NewHandler(service *Service) *Handler {
 	return &Handler{svc: service}
 }
 
-func (h *Handler) Register(c *fiber.Ctx) error {
+func (h *Handler) Create(c *fiber.Ctx) error {
 	req := new(CreateUserReq)
 	if err := c.BodyParser(req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{

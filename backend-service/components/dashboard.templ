@@ -1,0 +1,11 @@
+package components
+
+templ Dashboard(user string) {
+	@Base("Dashboard") {
+		<div>
+			<form method="POST" action="/auth/logout"><button class="btn btn-error">Log out</button></form>
+			<h1>Dashboard</h1>
+			<h2>Welcome, { user }</h2>
+		</div>
+	}
+}

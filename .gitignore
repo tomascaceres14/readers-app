@@ -37,7 +37,10 @@ go.work.sum
 tmp/*
 
 # React
-node_modules/
+*/node_modules/
 package-lock.json
 *.env*
 */tmp/*
+
+# Firebase
+backend-service/private_keys.json

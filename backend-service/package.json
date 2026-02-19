@@ -4,9 +4,10 @@
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.18",
+    "firebase": "^12.9.0",
     "tailwindcss": "^4.1.18"
   },
   "scripts": {
-    "build:css": "npx @tailwindcss/cli -i input.css -o static/css/output.css"
+    "build:css": "npx @tailwindcss/cli -i input.css -o web/static/css/output.css"
   }
 }
