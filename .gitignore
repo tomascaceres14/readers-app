@@ -34,7 +34,7 @@ go.work.sum
 # .vscode/
 
 # TMP
-tmp/*
+*/tmp/*
 
 # React
 */node_modules/
