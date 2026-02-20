@@ -84,7 +84,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 
 	expiresIn := time.Hour * 24 * 14
 
-	_, err := AuthClient.VerifyIDToken(context.Background(), cred.IdToken)
+	_, err := h..VerifyIDToken(context.Background(), cred.IdToken)
 	if err != nil {
 		fmt.Println(err)
 		return c.Status(400).SendString(err.Error())
