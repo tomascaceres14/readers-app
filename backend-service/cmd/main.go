@@ -1,32 +1,18 @@
 package main
 
 import (
-	"context"
 	"log"
 	"os"
 
-	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
-	"github.com/google/uuid"
 	"github.com/joho/godotenv"
-	"github.com/tomascaceres14/readers-app/app-server/backend-service/components"
 	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/auth"
+	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/dashboard"
 	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
-
-type Link struct {
-	ID     uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	Url    string
-	UserID string
-}
-
-func Render(c *fiber.Ctx, component templ.Component) error {
-	c.Set("Content-Type", "text/html")
-	return component.Render(c.Context(), c.Response().BodyWriter())
-}
 
 func main() {
 
@@ -39,45 +25,36 @@ func main() {
 
 	// Setup services
 	app := fiber.New()
-	app.Static("/static", "./web/static")
 
 	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	auth.InitFirebase()
+	authClient, err := auth.InitFirebase()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// Register entities and handlers
-	user.Initialize(app, db)
-	auth.Initialize(app, db)
+	// Users
+	userRepo := user.NewRepository(db)
+	userService := user.NewService(userRepo)
+	userHandler := user.NewHandler(userService)
+	user.RegisterRoutes(app, userHandler)
+
+	// Auth
+	authService := auth.NewService(authClient, userRepo)
+	authHandler := auth.NewHandler(authService)
+	auth.RegisterRoutes(app, authHandler)
+
+	// Dashboard
+	dashboardHandler := dashboard.NewHandler(authService, userService)
+	dashboard.RegisterRoutes(app, dashboardHandler)
 
 	app.Use(favicon.New(favicon.Config{
 		File: "./favicon.ico",
 	}))
-
-	app.Get("/", func(c *fiber.Ctx) error {
-		return Render(c, components.Welcome())
-	})
-
-	app.Get("/dashboard", func(c *fiber.Ctx) error {
-		sessionCookie := c.Cookies("session")
-
-		if sessionCookie == "" {
-			return c.Redirect("/login")
-		}
-
-		decoded, err := auth.AuthClient.VerifySessionCookie(
-			context.Background(),
-			sessionCookie,
-		)
-
-		if err != nil {
-			c.ClearCookie("session")
-			return c.Redirect("/login")
-		}
-		return Render(c, components.Dashboard(decoded.Claims["email"].(string)))
-	})
+	app.Static("/static", "./web/static")
 
 	log.Fatal(app.Listen(port))
 }

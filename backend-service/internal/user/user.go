@@ -4,27 +4,19 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 type User struct {
-	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	Username  string    `json:"username"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password"`
+	ID        string `gorm:"primaryKey"`
+	Username  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
-func Initialize(app *fiber.App, db *gorm.DB) {
-	repository := NewRepository(db)
-	service := NewService(repository)
-	handler := NewHandler(service)
-
-	app.Post("/users", handler.Create)
-	app.Get("/users", handler.GetAll)
-	app.Get("/users/:id", handler.FindById)
-	app.Put("/users/:id", handler.UpdateById)
-	app.Delete("/users/:id", handler.DeleteById)
+func RegisterRoutes(app *fiber.App, h *Handler) {
+	app.Post("/users", h.Create)
+	app.Get("/users", h.GetAll)
+	app.Get("/users/:id", h.FindById)
+	app.Put("/users/:id", h.UpdateById)
+	app.Delete("/users/:id", h.DeleteById)
 }

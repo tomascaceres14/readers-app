@@ -20,7 +20,6 @@ type UpdateUserReq struct {
 }
 
 type UserResponse struct {
-	Email     string    `json:"email"`
 	Username  string    `json:"username"`
 	CreatedAt time.Time `json:"created_at"`
 }
@@ -42,9 +41,7 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 	}
 
 	user := User{
-		Email:    req.Email,
 		Username: req.Username,
-		Password: req.Password,
 	}
 
 	if err := h.svc.Register(&user); err != nil {
@@ -70,7 +67,6 @@ func (h *Handler) GetAll(c *fiber.Ctx) error {
 
 	for _, u := range users {
 		usersResponse = append(usersResponse, UserResponse{
-			Email:     u.Email,
 			Username:  u.Username,
 			CreatedAt: u.CreatedAt,
 		})
@@ -95,7 +91,6 @@ func (h *Handler) FindById(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(UserResponse{
-		Email:     user.Email,
 		Username:  user.Username,
 		CreatedAt: user.CreatedAt,
 	})

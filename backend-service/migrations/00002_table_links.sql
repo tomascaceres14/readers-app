@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS links (
-id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+id uuid PRIMARY KEY DEFAULT gen_random_uuid() ,
 url TEXT NOT NULL,
 created_at TIMESTAMP NOT NULL DEFAULT NOW(),
 updated_at TIMESTAMP NOT NULL DEFAULT NOW()

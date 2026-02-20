@@ -11,10 +11,13 @@ import (
 )
 
 type Handler struct {
+	s *Service
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(s *Service) *Handler {
+	return &Handler{
+		s: s,
+	}
 }
 
 type Register struct {
@@ -35,6 +38,7 @@ func (h *Handler) LoginView(c *fiber.Ctx) error {
 }
 
 func (h *Handler) Register(c *fiber.Ctx) error {
+	fmt.Println("user handler")
 
 	var cred Register
 	if err := c.BodyParser(&cred); err != nil {
@@ -42,35 +46,9 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 		return c.Status(400).SendString("Invalid request.")
 	}
 
-	expiresIn := time.Hour * 24 * 14
-
-	_, err := AuthClient.VerifyIDToken(context.Background(), cred.IdToken)
-	if err != nil {
-		fmt.Println(err)
-		return c.Status(400).SendString("Error validating token.")
+	if err := h.s.Register(c, cred); err != nil {
+		return c.Status(400).SendString(err.Error())
 	}
-
-	sessionCookie, err := AuthClient.SessionCookie(
-		context.Background(),
-		cred.IdToken,
-		expiresIn,
-	)
-
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": "Failed to create session.",
-		})
-	}
-
-	c.Cookie(&fiber.Cookie{
-		Name:     "session",
-		Value:    sessionCookie,
-		Path:     "/",
-		MaxAge:   int(expiresIn.Seconds()),
-		HTTPOnly: true,
-		Secure:   true,
-	})
-
 	return c.Redirect("/dashboard")
 }
 
@@ -84,13 +62,13 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 
 	expiresIn := time.Hour * 24 * 14
 
-	_, err := h..VerifyIDToken(context.Background(), cred.IdToken)
+	_, err := h.s.auth.VerifyIDToken(context.Background(), cred.IdToken)
 	if err != nil {
 		fmt.Println(err)
 		return c.Status(400).SendString(err.Error())
 	}
 
-	sessionCookie, err := AuthClient.SessionCookie(
+	sessionCookie, err := h.s.auth.SessionCookie(
 		context.Background(),
 		cred.IdToken,
 		expiresIn,

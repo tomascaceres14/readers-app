@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS users (
-id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+id TEXT DEFAULT gen_random_uuid() PRIMARY KEY,
 username varchar(255) NOT NULL,
 email varchar(255) NOT NULL,
 password TEXT NOT NULL,
