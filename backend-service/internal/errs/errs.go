@@ -22,14 +22,14 @@ func NewError(code int, msg string, err error) *AppError {
 	}
 }
 
-func NotFound(code int, msg string, err error) *AppError {
+func NotFound(msg string, err error) *AppError {
 	return NewError(http.StatusNotFound, msg, err)
 }
 
-func BadRequest(code int, msg string, err error) *AppError {
+func BadRequest(msg string, err error) *AppError {
 	return NewError(http.StatusBadRequest, msg, err)
 }
 
-func Unauthorized(code int, msg string, err error) *AppError {
+func Unauthorized(msg string, err error) *AppError {
 	return NewError(http.StatusUnauthorized, msg, err)
 }

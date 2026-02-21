@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
+	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/errs"
 	"gorm.io/gorm"
 )
 
@@ -43,7 +44,7 @@ func (r *Repository) FindByUrl(url string) (*Resource, error) {
 	var resource Resource
 	if err := r.db.Where("url = ?", url).First(&resource).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil
+			return nil, errs.NotFound("resource not found", err)
 		}
 		return nil, err
 	}
