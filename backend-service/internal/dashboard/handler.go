@@ -21,12 +21,14 @@ func NewHandler(authService *auth.Service, userService *user.Service) *Handler {
 }
 
 func (h *Handler) Dashboard(c *fiber.Ctx) error {
+
+	// All of this should be a middleware
+
 	sessionCookie := c.Cookies("session")
 
 	if sessionCookie == "" {
 		return c.Redirect("/login")
 	}
-
 	decoded, err := h.authService.ValidateSessionCookie(
 		c.Context(),
 		sessionCookie,
@@ -36,5 +38,11 @@ func (h *Handler) Dashboard(c *fiber.Ctx) error {
 		c.ClearCookie("session")
 		return c.Redirect("/login")
 	}
-	return utils.Render(c, components.Dashboard(decoded.Claims["email"].(string)))
+	//
+	usr, err := h.userRepo.FindById(decoded.UID)
+	if err != nil {
+		return err
+	}
+
+	return utils.Render(c, components.Dashboard(usr.Username))
 }

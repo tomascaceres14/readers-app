@@ -13,39 +13,43 @@ import (
 )
 
 type Service struct {
-	usersRepository *user.Repository
-	auth            *auth.Client
+	UsrRepo *user.Repository
+	Auth    *auth.Client
 }
 
-func NewService(auth *auth.Client, userRepository *user.Repository) *Service {
+func NewService(auth *auth.Client, usrRepo *user.Repository) *Service {
 	return &Service{
-		usersRepository: userRepository,
-		auth:            auth,
+		UsrRepo: usrRepo,
+		Auth:    auth,
 	}
 }
 
 func (s *Service) Register(ctx *fiber.Ctx, credentials Register) error {
 
-	token, err := s.auth.VerifyIDToken(context.Background(), credentials.IdToken)
+	token, err := s.Auth.VerifyIDToken(context.Background(), credentials.IdToken)
 	if err != nil {
 		fmt.Println(err)
 		return errors.New("Unable to verify ID Token")
 	}
 
+	username := credentials.Username
+	if username == "" {
+		username = token.Claims["name"].(string)
+	}
+
 	userID := token.UID
-	user := &user.User{ID: userID, Username: credentials.Username}
-	if err := s.usersRepository.Register(user); err != nil {
+	user := &user.User{ID: userID, Username: username}
+	if err := s.UsrRepo.Register(user); err != nil {
 		return errors.New("Error registering user")
 	}
-	fmt.Println(userID, user)
 
 	expiresIn := s.GetCookieExpiration()
-	s.auth.SetCustomUserClaims(ctx.Context(), userID, map[string]any{"username": credentials.Username})
-	sessionCookie, err := s.auth.SessionCookie(
+	sessionCookie, err := s.Auth.SessionCookie(
 		context.Background(),
 		credentials.IdToken,
 		expiresIn,
 	)
+
 	if err != nil {
 		return errors.New("Failed to create new session.")
 	}
@@ -73,5 +77,5 @@ func (s *Service) GetCookieExpiration() time.Duration {
 }
 
 func (s *Service) ValidateSessionCookie(ctx context.Context, cookie string) (*auth.Token, error) {
-	return s.auth.VerifySessionCookieAndCheckRevoked(ctx, cookie)
+	return s.Auth.VerifySessionCookieAndCheckRevoked(ctx, cookie)
 }

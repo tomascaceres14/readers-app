@@ -1,7 +1,6 @@
 package user
 
 import (
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -22,7 +21,7 @@ func (r *Repository) FindAll() ([]User, error) {
 	return users, nil
 }
 
-func (r *Repository) FindById(id uuid.UUID) (*User, error) {
+func (r *Repository) FindById(id string) (*User, error) {
 	var user User
 	if err := r.db.First(&user, "id = ?", id).Error; err != nil {
 		return nil, err

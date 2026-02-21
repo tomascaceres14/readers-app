@@ -752,6 +752,13 @@
     --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
+  .btn-xs {
+    @layer daisyui.l1.l2 {
+      --fontsize: 0.6875rem;
+      --btn-p: 0.5rem;
+      --size: calc(var(--size-field, 0.25rem) * 6);
+    }
+  }
   .card-md {
     @layer daisyui.l1.l2 {
       .card-body {
@@ -761,6 +768,12 @@
       .card-title {
         --cardtitle-fs: 1.125rem;
       }
+    }
+  }
+  .btn-accent {
+    @layer daisyui.l1.l2.l3 {
+      --btn-color: var(--color-accent);
+      --btn-fg: var(--color-accent-content);
     }
   }
   .btn-error {
@@ -773,6 +786,42 @@
     @layer daisyui.l1.l2.l3 {
       --btn-color: var(--color-primary);
       --btn-fg: var(--color-primary-content);
+    }
+  }
+  .sm\:btn-sm {
+    @media (width >= 40rem) {
+      @layer daisyui.l1.l2 {
+        --fontsize: 0.75rem;
+        --btn-p: 0.75rem;
+        --size: calc(var(--size-field, 0.25rem) * 8);
+      }
+    }
+  }
+  .md\:btn-md {
+    @media (width >= 48rem) {
+      @layer daisyui.l1.l2 {
+        --fontsize: 0.875rem;
+        --btn-p: 1rem;
+        --size: calc(var(--size-field, 0.25rem) * 10);
+      }
+    }
+  }
+  .lg\:btn-lg {
+    @media (width >= 64rem) {
+      @layer daisyui.l1.l2 {
+        --fontsize: 1.125rem;
+        --btn-p: 1.25rem;
+        --size: calc(var(--size-field, 0.25rem) * 12);
+      }
+    }
+  }
+  .xl\:btn-xl {
+    @media (width >= 80rem) {
+      @layer daisyui.l1.l2 {
+        --fontsize: 1.375rem;
+        --btn-p: 1.5rem;
+        --size: calc(var(--size-field, 0.25rem) * 14);
+      }
     }
   }
 }

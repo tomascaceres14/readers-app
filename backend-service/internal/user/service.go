@@ -1,7 +1,5 @@
 package user
 
-import "github.com/google/uuid"
-
 type Service struct {
 	repo *Repository
 }
@@ -21,12 +19,7 @@ func (s *Service) Register(u *User) error {
 }
 
 func (s *Service) FindById(id string) (*User, error) {
-	uuid, err := uuid.Parse(id)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.repo.FindById(uuid)
+	return s.repo.FindById(id)
 }
 
 func (s *Service) UpdateById(id, username string) error {

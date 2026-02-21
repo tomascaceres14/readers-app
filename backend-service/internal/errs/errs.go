@@ -33,3 +33,7 @@ func BadRequest(msg string, err error) *AppError {
 func Unauthorized(msg string, err error) *AppError {
 	return NewError(http.StatusUnauthorized, msg, err)
 }
+
+func Internal(err error) *AppError {
+	return NewError(http.StatusInternalServerError, "internal server error", err)
+}

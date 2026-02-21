@@ -38,7 +38,6 @@ func (h *Handler) LoginView(c *fiber.Ctx) error {
 }
 
 func (h *Handler) Register(c *fiber.Ctx) error {
-	fmt.Println("user handler")
 
 	var cred Register
 	if err := c.BodyParser(&cred); err != nil {
@@ -62,13 +61,13 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 
 	expiresIn := time.Hour * 24 * 14
 
-	_, err := h.s.auth.VerifyIDToken(context.Background(), cred.IdToken)
+	_, err := h.s.Auth.VerifyIDToken(context.Background(), cred.IdToken)
 	if err != nil {
 		fmt.Println(err)
 		return c.Status(400).SendString(err.Error())
 	}
 
-	sessionCookie, err := h.s.auth.SessionCookie(
+	sessionCookie, err := h.s.Auth.SessionCookie(
 		context.Background(),
 		cred.IdToken,
 		expiresIn,

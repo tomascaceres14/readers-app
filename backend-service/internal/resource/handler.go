@@ -12,7 +12,7 @@ func NewHandler(s *Service) *Handler {
 	}
 }
 
-func (h *Handler) Create(c *fiber.Ctx) {
+func (h *Handler) Create(c *fiber.Ctx) error {
 	formUrl := c.FormValue("url")
 	if formUrl == "" {
 		c.Status(fiber.StatusBadRequest).SendString("No URL found.")
@@ -26,6 +26,14 @@ func (h *Handler) Create(c *fiber.Ctx) {
 		c.Status(fiber.StatusInternalServerError).SendString("Error creating resource in db.")
 	}
 
-	c.Status(fiber.StatusOK).SendString("resource created.")
+	return c.Status(fiber.StatusOK).Next()
+}
 
+func (h *Handler) GetAll(c *fiber.Ctx) error {
+	resources, err := h.s.GetAll()
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.Status(200).JSON(resources)
 }

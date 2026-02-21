@@ -33,8 +33,11 @@ func (r *Repository) FindAll() ([]Resource, error) {
 
 func (r *Repository) FindById(id uuid.UUID) (*Resource, error) {
 	var resource Resource
-	if err := r.db.First(&resource, "id = ?", id).Error; err != nil {
-		return nil, err
+	if err := r.db.Where("id = ?", id).First(&resource).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errs.NotFound("resource not found", err)
+		}
+		return nil, errs.Internal(err)
 	}
 
 	return &resource, nil

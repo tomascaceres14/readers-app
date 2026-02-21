@@ -32,27 +32,17 @@ document
   });
 
 document
-  .getElementById("register-google")
-  .addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const form = event.target;
-
-    const provider = new GoogleAuthProvider();
-    const cred = await signInWithPopup(auth, provider);
-    const idToken = await cred.user.getIdToken();
-    form.token.value = idToken;
-    form.submit();
-  });
-
-document
   .getElementById("login-google")
   .addEventListener("submit", async (event) => {
     event.preventDefault();
     const form = event.target;
-
-    const provider = new GoogleAuthProvider();
-    const cred = await signInWithPopup(auth, provider);
-    const idToken = await cred.user.getIdToken();
-    form.token.value = idToken;
-    form.submit();
+    try {
+      const provider = new GoogleAuthProvider();
+      const cred = await signInWithPopup(auth, provider);
+      const idToken = await cred.user.getIdToken();
+      form.token.value = idToken;
+      form.submit();
+    } catch (error) {
+      console.log(error);
+    }
   });

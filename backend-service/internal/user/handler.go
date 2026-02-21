@@ -1,12 +1,10 @@
 package user
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
 type CreateUserReq struct {
@@ -20,6 +18,7 @@ type UpdateUserReq struct {
 }
 
 type UserResponse struct {
+	ID        string    `json:"id"`
 	Username  string    `json:"username"`
 	CreatedAt time.Time `json:"created_at"`
 }
@@ -67,6 +66,7 @@ func (h *Handler) GetAll(c *fiber.Ctx) error {
 
 	for _, u := range users {
 		usersResponse = append(usersResponse, UserResponse{
+			ID:        u.ID,
 			Username:  u.Username,
 			CreatedAt: u.CreatedAt,
 		})
@@ -83,11 +83,7 @@ func (h *Handler) FindById(c *fiber.Ctx) error {
 
 	user, err := h.svc.FindById(id)
 	if err != nil {
-		msg := "Error finding user in db"
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			msg = "User not found."
-		}
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": msg})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	return c.Status(200).JSON(UserResponse{
