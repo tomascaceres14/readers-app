@@ -23,7 +23,7 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 	}
 
 	if err := h.s.Create(&resource); err != nil {
-		c.Status(fiber.StatusInternalServerError).SendString("Error creating resource in db.")
+		return err
 	}
 
 	return c.Status(fiber.StatusOK).Next()

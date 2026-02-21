@@ -1,9 +1,11 @@
 package resource
 
 import (
+	"errors"
 	"net/url"
 
 	"github.com/google/uuid"
+	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/errs"
 )
 
 type Service struct {
@@ -23,16 +25,16 @@ func (s *Service) Create(resource *Resource) error {
 	resource.Url = cleaned
 
 	existing, err := s.r.FindByUrl(cleaned)
-	if err != nil {
-		return err
-	}
-
-	if existing != nil {
+	if err == nil {
 		resource.ID = existing.ID
 		return nil
 	}
 
-	return s.r.Create(resource)
+	if errors.Is(err, errs.ErrNotFound) {
+		return s.r.Create(resource)
+	}
+
+	return err
 }
 
 func (s *Service) FindById(id string) (*Resource, error) {

@@ -1,7 +1,16 @@
 package errs
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
+)
+
+var (
+	ErrNotFound     = errors.New("not found")
+	ErrBadRequest   = errors.New("bad request")
+	ErrUnauthorized = errors.New("unauthorized")
+	ErrInternal     = errors.New("internal")
 )
 
 type AppError struct {
@@ -23,17 +32,17 @@ func NewError(code int, msg string, err error) *AppError {
 }
 
 func NotFound(msg string, err error) *AppError {
-	return NewError(http.StatusNotFound, msg, err)
+	return NewError(http.StatusNotFound, msg, fmt.Errorf("%w: %w", ErrNotFound, err))
 }
 
 func BadRequest(msg string, err error) *AppError {
-	return NewError(http.StatusBadRequest, msg, err)
+	return NewError(http.StatusBadRequest, msg, fmt.Errorf("%w: %w", ErrBadRequest, err))
 }
 
 func Unauthorized(msg string, err error) *AppError {
-	return NewError(http.StatusUnauthorized, msg, err)
+	return NewError(http.StatusUnauthorized, msg, fmt.Errorf("%w: %w", ErrUnauthorized, err))
 }
 
 func Internal(err error) *AppError {
-	return NewError(http.StatusInternalServerError, "internal server error", err)
+	return NewError(http.StatusInternalServerError, "internal server error", fmt.Errorf("%w: %w", ErrInternal, err))
 }

@@ -24,7 +24,7 @@ func (r *Repository) Create(resources *Resource) error {
 
 func (r *Repository) FindAll() ([]Resource, error) {
 	var resources []Resource
-	if err := r.db.Find(resources).Error; err != nil {
+	if err := r.db.Find(&resources).Error; err != nil {
 		return nil, err
 	}
 
