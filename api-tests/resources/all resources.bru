@@ -1,11 +1,11 @@
 meta {
-  name: delete user
+  name: all resources
   type: http
-  seq: 5
+  seq: 1
 }
 
-delete {
-  url: {{host}}/users/d744a191-05a9-4fb9-b05b-54c4997e4ff0
+get {
+  url: {{host}}/api/resource
   body: none
   auth: inherit
 }

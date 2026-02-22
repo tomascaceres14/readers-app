@@ -1,12 +1,12 @@
 meta {
-  name: user by id
+  name: delete user
   type: http
-  seq: 4
+  seq: 2
 }
 
-get {
+delete {
   url: {{host}}/users/d744a191-05a9-4fb9-b05b-54c4997e4ff0
-  body: formUrlEncoded
+  body: none
   auth: inherit
 }
 
