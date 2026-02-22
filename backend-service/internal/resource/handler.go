@@ -1,6 +1,8 @@
 package resource
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+)
 
 type Handler struct {
 	s *Service
@@ -22,7 +24,12 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 		Url: formUrl,
 	}
 
-	if err := h.s.Create(&resource); err != nil {
+	uid, ok := c.Locals("uid").(string)
+	if !ok || uid == "" {
+		return c.Status(fiber.StatusBadRequest).SendString("bad request")
+	}
+
+	if err := h.s.Create(&resource, uid); err != nil {
 		return c.Status(500).SendString(err.Error())
 	}
 

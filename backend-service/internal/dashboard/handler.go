@@ -9,40 +9,20 @@ import (
 )
 
 type Handler struct {
-	authService *auth.Service
-	userRepo    *user.Service
+	userSvc *user.Service
 }
 
 func NewHandler(authService *auth.Service, userService *user.Service) *Handler {
 	return &Handler{
-		authService: authService,
-		userRepo:    userService,
+		userSvc: userService,
 	}
 }
 
 func (h *Handler) Dashboard(c *fiber.Ctx) error {
-
-	// All of this should be a middleware
-
-	sessionCookie := c.Cookies("session")
-
-	if sessionCookie == "" {
-		return c.Redirect("/login")
-	}
-	decoded, err := h.authService.ValidateSessionCookie(
-		c.Context(),
-		sessionCookie,
-	)
-
-	if err != nil {
-		c.ClearCookie("session")
-		return c.Redirect("/login")
-	}
-	//
-	usr, err := h.userRepo.FindById(decoded.UID)
+	uid := c.Locals("uid").(string)
+	usr, err := h.userSvc.FindById(uid)
 	if err != nil {
 		return err
 	}
-
 	return utils.Render(c, components.Dashboard(usr.Username))
 }

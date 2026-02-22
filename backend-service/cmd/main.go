@@ -9,8 +9,10 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/auth"
 	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/dashboard"
+	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/middleware"
 	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/resource"
 	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/user"
+	userresources "github.com/tomascaceres14/readers-app/app-server/backend-service/internal/user_resource"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -37,6 +39,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Middleware
+	sessionMiddleware := middleware.FirebaseSessionMiddleware(authClient)
+
+	urRepo := userresources.NewRepository(db)
+
 	// Users
 	usrRepo := user.NewRepository(db)
 	usrSvc := user.NewService(usrRepo)
@@ -45,9 +52,9 @@ func main() {
 
 	// Resources
 	rscRepo := resource.NewRepository(db)
-	rscSvc := resource.NewService(rscRepo)
+	rscSvc := resource.NewService(rscRepo, urRepo)
 	rscHandler := resource.NewHandler(rscSvc)
-	resource.RegisterRoutes(app, rscHandler)
+	resource.RegisterRoutes(app, rscHandler, sessionMiddleware)
 
 	// Auth
 	authService := auth.NewService(authClient, usrRepo)
@@ -56,7 +63,7 @@ func main() {
 
 	// Dashboard
 	dashHandler := dashboard.NewHandler(authService, usrSvc)
-	dashboard.RegisterRoutes(app, dashHandler)
+	dashboard.RegisterRoutes(app, dashHandler, sessionMiddleware)
 
 	app.Use(favicon.New(favicon.Config{
 		File: "./favicon.ico",

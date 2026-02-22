@@ -5,7 +5,12 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/resource"
 )
+
+type Handler struct {
+	svc *Service
+}
 
 type CreateUserReq struct {
 	Email    string `json:"email"`
@@ -18,13 +23,10 @@ type UpdateUserReq struct {
 }
 
 type UserResponse struct {
-	ID        string    `json:"id"`
-	Username  string    `json:"username"`
-	CreatedAt time.Time `json:"created_at"`
-}
-
-type Handler struct {
-	svc *Service
+	ID        string              `json:"id"`
+	Username  string              `json:"username"`
+	Resources []resource.Resource `json:"scrapped_resources"`
+	CreatedAt time.Time           `json:"created_at"`
 }
 
 func NewHandler(service *Service) *Handler {
