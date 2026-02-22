@@ -64,8 +64,6 @@ func (h *Handler) GetAll(c *fiber.Ctx) error {
 		return c.SendString(err.Error())
 	}
 
-	fmt.Println(users)
-
 	usersResponse := make([]UserResponse, 0)
 
 	for _, u := range users {
