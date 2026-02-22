@@ -23,10 +23,10 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 	}
 
 	if err := h.s.Create(&resource); err != nil {
-		return err
+		return c.Status(500).SendString(err.Error())
 	}
 
-	return c.Status(fiber.StatusOK).Next()
+	return c.Status(fiber.StatusOK).SendString("done!")
 }
 
 func (h *Handler) GetAll(c *fiber.Ctx) error {

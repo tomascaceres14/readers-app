@@ -2,8 +2,8 @@ package resource
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/errs"
@@ -25,10 +25,7 @@ func (s *Service) Create(resource *Resource) error {
 	cleaned := cleanURL(resource.Url)
 	resource.Url = cleaned
 
-	fmt.Println("received", cleaned)
 	existing, err := s.r.FindByUrl(cleaned)
-	fmt.Println("existing:", existing)
-	fmt.Println("error:", err)
 	if err == nil {
 		resource.ID = existing.ID
 		return nil
@@ -59,5 +56,6 @@ func cleanURL(rawURL string) string {
 	if err != nil {
 		return rawURL
 	}
-	return u.Host + u.Path
+	host := strings.TrimPrefix(u.Host, "www.")
+	return host + u.Path
 }

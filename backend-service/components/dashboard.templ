@@ -6,10 +6,11 @@ templ Dashboard(user string) {
 			<form method="POST" action="/auth/logout"><button class="btn btn-error">Log out</button></form>
 			<h1>Dashboard</h1>
 			<h2>Welcome, { user }</h2>
-			<form method="POST" action="/resource">
+			<form hx-post="/resource" hx-target="#result" hx-swap="innerHTML">
 				<input type="text" placeholder="What are we scraping?" class="input" name="url"/>
 				<button class="btn btn-accent">Scrape!</button>
 			</form>
+			<div id="result"></div>
 		</div>
 	}
 }
