@@ -27,8 +27,14 @@ func (s *Service) Create(resourceReq *Resource, uid string) error {
 	if uid == "" {
 		return errs.ErrBadRequest
 	}
+
 	var resourceID uuid.UUID
-	cleaned := cleanURL(resourceReq.Url)
+
+	cleaned, err := cleanURL(resourceReq.Url)
+	if err != nil {
+		return err
+	}
+
 	resourceReq.Url = cleaned
 
 	existing, err := s.r.FindByUrl(cleaned)
@@ -70,11 +76,16 @@ func (s *Service) DeleteAll() {
 	s.r.DeleteAll()
 }
 
-func cleanURL(rawURL string) string {
+func cleanURL(rawURL string) (string, error) {
+	if !strings.Contains(rawURL, ".com") {
+		return "", errs.ErrBadRequest
+	}
+
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return rawURL
+		return "", err
 	}
+
 	host := strings.TrimPrefix(u.Host, "www.")
-	return host + u.Path
+	return host + u.Path, nil
 }

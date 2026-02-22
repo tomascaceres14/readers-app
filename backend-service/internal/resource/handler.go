@@ -17,20 +17,17 @@ func NewHandler(s *Service) *Handler {
 func (h *Handler) Create(c *fiber.Ctx) error {
 	formUrl := c.FormValue("url")
 	if formUrl == "" {
-		c.Status(fiber.StatusBadRequest).SendString("No URL found.")
+		return c.Status(fiber.StatusOK).SendString("No URL found.")
 	}
 
 	resource := Resource{
 		Url: formUrl,
 	}
 
-	uid, ok := c.Locals("uid").(string)
-	if !ok || uid == "" {
-		return c.Status(fiber.StatusBadRequest).SendString("bad request")
-	}
+	uid := c.Locals("uid").(string)
 
 	if err := h.s.Create(&resource, uid); err != nil {
-		return c.Status(500).SendString(err.Error())
+		return c.Status(fiber.StatusOK).SendString(err.Error())
 	}
 
 	return c.Status(fiber.StatusOK).SendString("done!")
