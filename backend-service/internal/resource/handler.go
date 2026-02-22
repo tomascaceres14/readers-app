@@ -37,3 +37,8 @@ func (h *Handler) GetAll(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(resources)
 }
+
+func (h *Handler) DeleteAll(c *fiber.Ctx) error {
+	h.s.DeleteAll()
+	return c.Status(200).SendString("ok")
+}

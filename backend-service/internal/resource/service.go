@@ -2,6 +2,7 @@ package resource
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
 
 	"github.com/google/uuid"
@@ -24,7 +25,10 @@ func (s *Service) Create(resource *Resource) error {
 	cleaned := cleanURL(resource.Url)
 	resource.Url = cleaned
 
+	fmt.Println("received", cleaned)
 	existing, err := s.r.FindByUrl(cleaned)
+	fmt.Println("existing:", existing)
+	fmt.Println("error:", err)
 	if err == nil {
 		resource.ID = existing.ID
 		return nil
@@ -44,6 +48,10 @@ func (s *Service) FindById(id string) (*Resource, error) {
 	}
 
 	return s.r.FindById(uuid)
+}
+
+func (s *Service) DeleteAll() {
+	s.r.DeleteAll()
 }
 
 func cleanURL(rawURL string) string {

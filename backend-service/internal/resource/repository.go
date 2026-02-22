@@ -47,9 +47,13 @@ func (r *Repository) FindByUrl(url string) (*Resource, error) {
 	var resource Resource
 	if err := r.db.Where("url = ?", url).First(&resource).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errs.NotFound("resource not found", err)
+			return nil, errs.ErrNotFound
 		}
 		return nil, err
 	}
 	return &resource, nil
+}
+
+func (r *Repository) DeleteAll() {
+	r.db.Where("1 = 1").Delete(&Resource{})
 }

@@ -8,7 +8,7 @@ import (
 )
 
 type Resource struct {
-	ID        uuid.UUID `gorm:"primaryKey"`
+	ID        uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	Url       string
 	CreatedAt time.Time
 }
@@ -16,4 +16,5 @@ type Resource struct {
 func RegisterRoutes(app *fiber.App, h *Handler) {
 	app.Post("/resource", h.Create)
 	app.Get("/api/resource", h.GetAll)
+	app.Delete("/api/resource", h.DeleteAll)
 }
