@@ -64,6 +64,8 @@ func (h *Handler) GetAll(c *fiber.Ctx) error {
 		return c.SendString(err.Error())
 	}
 
+	fmt.Println(users)
+
 	usersResponse := make([]UserResponse, 0)
 
 	for _, u := range users {
@@ -71,6 +73,7 @@ func (h *Handler) GetAll(c *fiber.Ctx) error {
 			ID:        u.ID,
 			Username:  u.Username,
 			CreatedAt: u.CreatedAt,
+			Resources: u.Resources,
 		})
 	}
 

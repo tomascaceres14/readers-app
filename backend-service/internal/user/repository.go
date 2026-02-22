@@ -14,7 +14,7 @@ func NewRepository(db *gorm.DB) *Repository {
 
 func (r *Repository) FindAll() ([]User, error) {
 	var users []User
-	if err := r.db.Find(&users).Error; err != nil {
+	if err := r.db.Preload("Resources").Find(&users).Error; err != nil {
 		return nil, err
 	}
 

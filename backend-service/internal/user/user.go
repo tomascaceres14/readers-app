@@ -10,7 +10,7 @@ import (
 type User struct {
 	ID        string `gorm:"primaryKey"`
 	Username  string
-	Resources []resource.Resource `gorm:"many2many;user_resources"`
+	Resources []resource.Resource `gorm:"many2many:user_resources;"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt time.Time
