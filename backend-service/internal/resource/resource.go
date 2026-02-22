@@ -8,9 +8,9 @@ import (
 )
 
 type Resource struct {
-	ID        uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	Url       string
-	CreatedAt time.Time
+	ID        uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	Url       string    `json:"url"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 func RegisterRoutes(app *fiber.App, h *Handler, authMiddleware fiber.Handler) {
