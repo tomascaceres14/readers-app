@@ -39,7 +39,6 @@ func (s *Service) Create(resource *Resource, uid string) error {
 	switch err {
 	case nil:
 		if s.urSvc.Exists(uid, existing.ID) {
-			fmt.Println("exists!")
 			return errs.ErrAlreadyExists
 		}
 		resource.ID = existing.ID
