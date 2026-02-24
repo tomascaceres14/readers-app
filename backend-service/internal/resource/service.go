@@ -23,36 +23,38 @@ func (s *Service) GetAll() ([]Resource, error) {
 	return s.r.FindAll()
 }
 
-func (s *Service) Create(resourceReq *Resource, uid string) error {
+func (s *Service) Create(resource *Resource, uid string) error {
 	if uid == "" {
 		return errs.ErrBadRequest
 	}
 
-	var resourceID uuid.UUID
-
-	cleaned, err := cleanURL(resourceReq.Url)
+	cleaned, err := cleanURL(resource.Url)
 	if err != nil {
 		return err
 	}
 
-	resourceReq.Url = cleaned
+	resource.Url = cleaned
 
 	existing, err := s.r.FindByUrl(cleaned)
 	switch err {
 	case nil:
-		resourceID = existing.ID
+		if s.urSvc.Exists(uid, existing.ID) {
+			fmt.Println("exists!")
+			return errs.ErrAlreadyExists
+		}
+		resource.ID = existing.ID
 	case errs.ErrNotFound:
-		if error := s.r.Create(resourceReq); error != nil {
+		if error := s.r.Create(resource); error != nil {
+			fmt.Println(err)
 			return error
 		}
-		resourceID = resourceReq.ID
 	default:
 		return err
 	}
 
 	userResource := userresources.UserResource{
 		UserID:     uid,
-		ResourceID: resourceID,
+		ResourceID: resource.ID,
 	}
 
 	if err := s.urSvc.Update(&userResource); err != nil {

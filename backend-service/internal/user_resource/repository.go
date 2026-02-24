@@ -1,6 +1,7 @@
 package userresources
 
 import (
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -22,4 +23,13 @@ func (r *Repository) Update(userResource *UserResource) error {
 
 func (r *Repository) Delete(userResource *UserResource) {
 	r.db.Delete(userResource)
+}
+
+func (r *Repository) Exists(uid string, resourceID uuid.UUID) bool {
+	var count int64
+	err := r.db.Model(&UserResource{}).Where("user_id = ? AND resource_id = ?", uid, resourceID).Count(&count).Error
+	if err != nil {
+		return false
+	}
+	return count > 0
 }

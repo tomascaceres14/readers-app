@@ -21,9 +21,15 @@ func (r *Repository) FindAll() ([]User, error) {
 	return users, nil
 }
 
-func (r *Repository) FindById(id string) (*User, error) {
+func (r *Repository) FindById(id string, desc bool) (*User, error) {
 	var user User
-	if err := r.db.First(&user, "id = ?", id).Error; err != nil {
+	order := "asc"
+	if desc {
+		order = "desc"
+	}
+	if err := r.db.Preload("Resources", func(db *gorm.DB) *gorm.DB {
+		return db.Order("created_at " + order)
+	}).First(&user, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 

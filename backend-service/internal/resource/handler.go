@@ -1,7 +1,11 @@
 package resource
 
 import (
+	"errors"
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/errs"
+	"github.com/tomascaceres14/readers-app/app-server/backend-service/utils"
 )
 
 type Handler struct {
@@ -27,10 +31,14 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 	uid := c.Locals("uid").(string)
 
 	if err := h.s.Create(&resource, uid); err != nil {
+		if errors.Is(err, errs.ErrAlreadyExists) {
+			c.Status(fiber.StatusOK)
+			return utils.Render(c, ExistsMessage())
+		}
 		return c.Status(fiber.StatusOK).SendString(err.Error())
 	}
 
-	return c.Status(fiber.StatusOK).SendString("done!")
+	return utils.Render(c, SuccessCreateResource(resource))
 }
 
 func (h *Handler) GetAll(c *fiber.Ctx) error {

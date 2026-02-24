@@ -1,14 +1,11 @@
 package middleware
 
 import (
-	"fmt"
-
 	"firebase.google.com/go/v4/auth"
 	"github.com/gofiber/fiber/v2"
 )
 
 func FirebaseSessionMiddleware(auth *auth.Client) fiber.Handler {
-	fmt.Println("Loading middleware...")
 	return func(c *fiber.Ctx) error {
 
 		sessionCookie := c.Cookies("session")

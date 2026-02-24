@@ -7,10 +7,11 @@ import (
 )
 
 var (
-	ErrNotFound     = errors.New("not found")
-	ErrBadRequest   = errors.New("bad request")
-	ErrUnauthorized = errors.New("unauthorized")
-	ErrInternal     = errors.New("internal")
+	ErrNotFound      = errors.New("not found")
+	ErrBadRequest    = errors.New("bad request")
+	ErrUnauthorized  = errors.New("unauthorized")
+	ErrInternal      = errors.New("internal")
+	ErrAlreadyExists = errors.New("already exists")
 )
 
 type AppError struct {

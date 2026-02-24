@@ -84,7 +84,7 @@ func (h *Handler) FindById(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Id in path not found"})
 	}
 
-	user, err := h.svc.FindById(id)
+	user, err := h.svc.FindById(id, false)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}

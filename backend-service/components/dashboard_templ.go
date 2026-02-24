@@ -8,7 +8,10 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func Dashboard(user string) templ.Component {
+import "github.com/tomascaceres14/readers-app/app-server/backend-service/internal/user"
+import "github.com/tomascaceres14/readers-app/app-server/backend-service/internal/resource"
+
+func Dashboard(u *user.User) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -41,20 +44,37 @@ func Dashboard(user string) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div><form method=\"POST\" action=\"/auth/logout\"><button class=\"btn btn-error\">Log out</button></form><h1>Dashboard</h1><h2>Welcome, ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex flex-col gap-8\"><div class=\"flex justify-between items-center mx-5 mt-1 \"><h1>Dashboard</h1><form method=\"POST\" action=\"/auth/logout\"><button class=\"btn btn-error\">Log out</button></form></div><h2 class=\"self-center\">Welcome, ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(user)
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(u.Username)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/dashboard.templ`, Line: 8, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/dashboard.templ`, Line: 13, Col: 48}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</h2><div class=\"flex flex-col\"><form hx-post=\"/api/resource\" hx-target=\"#result\" hx-swap=\"innerHTML\"><input type=\"text\" placeholder=\"What are we scraping?\" class=\"input\" name=\"url\"> <button class=\"btn btn-accent\">Scrape!</button></form><div class=\"text-green-600\" id=\"result\"></div></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</h2><div class=\"flex flex-col items-center w-full\"><form hx-post=\"/api/resource\" hx-target=\"#resources-list\" hx-swap=\"beforeend\" class=\"flex gap-2 w-90\"><input type=\"text\" placeholder=\"What are we scraping?\" class=\"input input-bordered flex-1\" name=\"url\"> <button class=\"btn btn-accent\">Scrape!</button></form><div class=\"text-green-600\" id=\"scrape-result\"></div></div><div class=\"flex flex-col gap-2 self-center\"><h3>Your Links</h3><ul id=\"resources-list\" class=\"flex flex-col gap-2\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if len(u.Resources) == 0 {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<p class=\"text-gray-500\">No links yet</p>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else {
+				for _, r := range u.Resources {
+					templ_7745c5c3_Err = resource.ResourceItem(r).Render(ctx, templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</ul></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -18,13 +18,13 @@ func (s *Service) Register(u *User) error {
 	return s.repo.Register(u)
 }
 
-func (s *Service) FindById(id string) (*User, error) {
-	return s.repo.FindById(id)
+func (s *Service) FindById(id string, desc bool) (*User, error) {
+	return s.repo.FindById(id, desc)
 }
 
 func (s *Service) UpdateById(id, username string) error {
 
-	user, err := s.FindById(id)
+	user, err := s.FindById(id, false)
 	if err != nil {
 		return err
 	}
@@ -35,6 +35,6 @@ func (s *Service) UpdateById(id, username string) error {
 }
 
 func (s *Service) DeleteById(id string) {
-	user, _ := s.FindById(id)
+	user, _ := s.FindById(id, false)
 	s.repo.Delete(user)
 }
