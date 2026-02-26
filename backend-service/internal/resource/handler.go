@@ -37,7 +37,6 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 		}
 		return c.Status(fiber.StatusOK).SendString(err.Error())
 	}
-
 	return utils.Render(c, SuccessCreateResource(resource))
 }
 

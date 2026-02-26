@@ -13,6 +13,15 @@ func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{db: db}
 }
 
+func (r *Repository) FindAll() ([]UserResource, error) {
+	var resources []UserResource
+	if err := r.db.Find(&resources).Error; err != nil {
+		return nil, err
+	}
+
+	return resources, nil
+}
+
 func (r *Repository) Create(userResource *UserResource) error {
 	return r.db.Create(userResource).Error
 }

@@ -20,7 +20,7 @@ func NewHandler(authService *auth.Service, userService *user.Service) *Handler {
 
 func (h *Handler) Dashboard(c *fiber.Ctx) error {
 	uid := c.Locals("uid").(string)
-	usr, err := h.userSvc.FindById(uid, true)
+	usr, err := h.userSvc.FindByIdWithResourcesAndRelationDate(uid, true)
 	if err != nil {
 		return err
 	}

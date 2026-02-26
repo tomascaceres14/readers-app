@@ -68,6 +68,11 @@ func main() {
 	app.Use(favicon.New(favicon.Config{
 		File: "./favicon.ico",
 	}))
+
+	app.Get("/ur", func(c *fiber.Ctx) error {
+		urList, _ := urRepo.FindAll()
+		return c.JSON(urList)
+	})
 	app.Static("/static", "./web/static")
 
 	log.Fatal(app.Listen(port))

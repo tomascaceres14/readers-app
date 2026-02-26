@@ -1,9 +1,9 @@
 package resource
 
 import (
-	"fmt"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/errs"
@@ -41,10 +41,9 @@ func (s *Service) Create(resource *Resource, uid string) error {
 		if s.urSvc.Exists(uid, existing.ID) {
 			return errs.ErrAlreadyExists
 		}
-		resource.ID = existing.ID
+		*resource = *existing
 	case errs.ErrNotFound:
 		if error := s.r.Create(resource); error != nil {
-			fmt.Println(err)
 			return error
 		}
 	default:
@@ -54,12 +53,14 @@ func (s *Service) Create(resource *Resource, uid string) error {
 	userResource := userresources.UserResource{
 		UserID:     uid,
 		ResourceID: resource.ID,
+		CreatedAt:  time.Now(),
 	}
 
-	if err := s.urSvc.Update(&userResource); err != nil {
-		fmt.Println(err)
+	if err := s.urSvc.Create(&userResource); err != nil {
 		return err
 	}
+
+	resource.CreatedAt = userResource.CreatedAt
 
 	return nil
 }

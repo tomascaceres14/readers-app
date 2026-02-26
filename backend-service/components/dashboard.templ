@@ -12,7 +12,7 @@ templ Dashboard(u *user.User) {
 			</div>
 			<h2 class="self-center">Welcome, { u.Username }</h2>
 			<div class="flex flex-col items-center w-full">
-				<form hx-post="/api/resource" hx-target="#resources-list" hx-swap="beforeend" class="flex gap-2 w-90">
+				<form hx-post="/api/resource" hx-target="#resources-list" hx-swap="afterbegin" class="flex gap-2 w-90">
 					<input type="text" placeholder="What are we scraping?" class="input input-bordered flex-1" name="url"/>
 					<button class="btn btn-accent">Scrape!</button>
 				</form>

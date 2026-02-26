@@ -19,7 +19,15 @@ func (s *Service) Register(u *User) error {
 }
 
 func (s *Service) FindById(id string, desc bool) (*User, error) {
-	return s.repo.FindById(id, desc)
+	return s.repo.FindById(id)
+}
+
+func (s *Service) FindByIdWithResources(id string, desc bool) (*User, error) {
+	return s.repo.FindByIdWithResources(id, desc)
+}
+
+func (s *Service) FindByIdWithResourcesAndRelationDate(id string, desc bool) (*User, error) {
+	return s.repo.FindByIdWithResourcesAndRelationDate(id, desc)
 }
 
 func (s *Service) UpdateById(id, username string) error {
