@@ -11,8 +11,8 @@ tmp_dir = "tmp"
 
   # Archivos a observar
   include_ext = ["go", "templ", "html", "css"]
-  exclude_regex = ["_templ\\.go"]
-  exclude_dir = ["tmp", "vendor"]
+  exclude_regex = ["_templ\\.go", ]
+  exclude_dir = ["tmp", "vendor", "node_modules", "migrations"]
 
   # Delay chico para evitar rebuilds múltiples
   delay = 1000

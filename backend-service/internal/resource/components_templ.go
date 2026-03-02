@@ -139,7 +139,7 @@ func ExistsMessage() templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<p hx-swap-oob=\"true\" id=\"scrape-result\" class=\"text-yellow-600\">resource already exists!</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<p hx-swap-oob=\"true\" id=\"scrape-result\" class=\"text-yellow-600\">resource already exist!</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -168,11 +168,11 @@ func SuccessCreateResource(r Resource) templ.Component {
 			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = ResourceItem(r).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = SuccessMessage().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = SuccessMessage().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ResourceItem(r).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

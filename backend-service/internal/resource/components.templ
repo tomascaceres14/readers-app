@@ -12,10 +12,10 @@ templ SuccessMessage() {
 }
 
 templ ExistsMessage() {
-	<p hx-swap-oob="true" id="scrape-result" class="text-yellow-600">resource already exists!</p>
+	<p hx-swap-oob="true" id="scrape-result" class="text-yellow-600">resource already exist!</p>
 }
 
 templ SuccessCreateResource(r Resource) {
-	@ResourceItem(r)
 	@SuccessMessage()
+	@ResourceItem(r)
 }
