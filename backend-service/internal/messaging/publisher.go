@@ -4,11 +4,27 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/tomascaceres14/readers-app/app-server/backend-service/utils"
 )
+
+type RabbitConfig struct {
+	URL          string
+	Exchange     string
+	RoutingKey   string
+	ExchangeType string
+}
+
+func NewRabbitConfig() RabbitConfig {
+	return RabbitConfig{
+		URL:          utils.GetEnv("RABBITMQ_URL", "amqp://admin:admin@localhost:5672/"),
+		Exchange:     utils.GetEnv("RABBITMQ_EXCHANGE", "scraping.exchange"),
+		RoutingKey:   utils.GetEnv("RABBITMQ_ROUTING_KEY", "scrape"),
+		ExchangeType: utils.GetEnv("RABBITMQ_EXCHANGE_TYPE", amqp.ExchangeTopic),
+	}
+}
 
 type Message struct {
 	UserID     string `json:"user_id"`
@@ -19,15 +35,13 @@ type Message struct {
 type Publisher struct {
 	conn    *amqp.Connection
 	channel *amqp.Channel
+	config  RabbitConfig
 }
 
 func NewPublisher() (*Publisher, error) {
-	url := os.Getenv("RABBITMQ_URL")
-	if url == "" {
-		url = "amqp://admin:admin@localhost:5672/"
-	}
+	config := NewRabbitConfig()
 
-	conn, err := amqp.Dial(url)
+	conn, err := amqp.Dial(config.URL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to RabbitMQ: %w", err)
 	}
@@ -38,13 +52,13 @@ func NewPublisher() (*Publisher, error) {
 		return nil, fmt.Errorf("failed to open channel: %w", err)
 	}
 
-	return &Publisher{conn: conn, channel: ch}, nil
+	return &Publisher{conn: conn, channel: ch, config: config}, nil
 }
 
 func (p *Publisher) Setup() error {
 	err := p.channel.ExchangeDeclare(
-		"content.exchange",
-		"topic",
+		p.config.Exchange,
+		p.config.ExchangeType,
 		true,
 		false,
 		false,
@@ -53,29 +67,6 @@ func (p *Publisher) Setup() error {
 	)
 	if err != nil {
 		return fmt.Errorf("failed to declare exchange: %w", err)
-	}
-
-	_, err = p.channel.QueueDeclare(
-		"content.scraping",
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to declare queue: %w", err)
-	}
-
-	err = p.channel.QueueBind(
-		"content.scraping",
-		"scrape",
-		"content.exchange",
-		false,
-		nil,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to bind queue: %w", err)
 	}
 
 	return nil
@@ -91,8 +82,8 @@ func (p *Publisher) PublishScrapingTask(msg Message) error {
 	defer cancel()
 
 	err = p.channel.PublishWithContext(ctx,
-		"content.exchange",
-		"scrape",
+		p.config.Exchange,
+		p.config.RoutingKey,
 		false,
 		false,
 		amqp.Publishing{

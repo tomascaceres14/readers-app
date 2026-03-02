@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"os"
+
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
 )
@@ -8,4 +10,11 @@ import (
 func Render(c *fiber.Ctx, component templ.Component) error {
 	c.Set("Content-Type", "text/html")
 	return component.Render(c.Context(), c.Response().BodyWriter())
+}
+
+func GetEnv(key, fallback string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return fallback
 }
