@@ -9,8 +9,10 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/auth"
 	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/dashboard"
+	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/messaging"
 	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/middleware"
 	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/resource"
+	resourcestatus "github.com/tomascaceres14/readers-app/app-server/backend-service/internal/resource_status"
 	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/user"
 	userresources "github.com/tomascaceres14/readers-app/app-server/backend-service/internal/user_resource"
 	"gorm.io/driver/postgres"
@@ -43,6 +45,16 @@ func main() {
 	sessionMiddleware := middleware.FirebaseSessionMiddleware(authClient)
 
 	urRepo := userresources.NewRepository(db)
+	statusRepo := resourcestatus.NewRepository(db)
+
+	publisher, err := messaging.NewPublisher()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := publisher.Setup(); err != nil {
+		log.Fatal(err)
+	}
+	defer publisher.Close()
 
 	// Users
 	usrRepo := user.NewRepository(db)
@@ -52,7 +64,7 @@ func main() {
 
 	// Resources
 	rscRepo := resource.NewRepository(db)
-	rscSvc := resource.NewService(rscRepo, urRepo)
+	rscSvc := resource.NewService(rscRepo, urRepo, statusRepo, publisher)
 	rscHandler := resource.NewHandler(rscSvc)
 	resource.RegisterRoutes(app, rscHandler, sessionMiddleware)
 
