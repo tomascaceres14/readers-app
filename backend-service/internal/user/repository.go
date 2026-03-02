@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/resource"
+	"github.com/tomascaceres14/readers-app/backend-service/internal/resource"
 	"gorm.io/gorm"
 )
 

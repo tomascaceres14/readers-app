@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/errs"
+	"github.com/tomascaceres14/readers-app/backend-service/internal/errs"
 	"gorm.io/gorm"
 )
 

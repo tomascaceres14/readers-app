@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/errs"
-	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/messaging"
-	resourcestatus "github.com/tomascaceres14/readers-app/app-server/backend-service/internal/resource_status"
-	userresources "github.com/tomascaceres14/readers-app/app-server/backend-service/internal/user_resource"
+	"github.com/tomascaceres14/readers-app/backend-service/internal/errs"
+	"github.com/tomascaceres14/readers-app/backend-service/internal/messaging"
+	resourcestatus "github.com/tomascaceres14/readers-app/backend-service/internal/resource_status"
+	userresources "github.com/tomascaceres14/readers-app/backend-service/internal/user_resource"
 )
 
 type Service struct {

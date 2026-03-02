@@ -7,7 +7,7 @@ import (
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/tomascaceres14/readers-app/app-server/backend-service/utils"
+	"github.com/tomascaceres14/readers-app/backend-service/utils"
 )
 
 type RabbitConfig struct {

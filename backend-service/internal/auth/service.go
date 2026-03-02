@@ -9,7 +9,7 @@ import (
 
 	"firebase.google.com/go/v4/auth"
 	"github.com/gofiber/fiber/v2"
-	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/user"
+	"github.com/tomascaceres14/readers-app/backend-service/internal/user"
 )
 
 type Service struct {

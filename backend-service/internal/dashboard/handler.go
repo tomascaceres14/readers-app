@@ -2,10 +2,10 @@ package dashboard
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/tomascaceres14/readers-app/app-server/backend-service/components"
-	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/auth"
-	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/user"
-	"github.com/tomascaceres14/readers-app/app-server/backend-service/utils"
+	"github.com/tomascaceres14/readers-app/backend-service/components"
+	"github.com/tomascaceres14/readers-app/backend-service/internal/auth"
+	"github.com/tomascaceres14/readers-app/backend-service/internal/user"
+	"github.com/tomascaceres14/readers-app/backend-service/utils"
 )
 
 type Handler struct {

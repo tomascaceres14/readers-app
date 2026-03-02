@@ -5,7 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	resourcestatus "github.com/tomascaceres14/readers-app/app-server/backend-service/internal/resource_status"
+	resourcestatus "github.com/tomascaceres14/readers-app/backend-service/internal/resource_status"
 )
 
 type Resource struct {

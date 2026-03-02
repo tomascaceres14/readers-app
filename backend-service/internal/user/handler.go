@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/tomascaceres14/readers-app/app-server/backend-service/internal/resource"
+	"github.com/tomascaceres14/readers-app/backend-service/internal/resource"
 )
 
 type Handler struct {
