@@ -2,6 +2,7 @@ package scraping
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -33,24 +34,42 @@ func NewScraper() *Scraper {
 }
 
 func (s *Scraper) Scrape(url string) {
-	f, err := os.Create("files/sample.md")
-	if err != nil {
-		panic(err)
-	}
+	c := s.Collector
+	var f *os.File
 	defer f.Close()
 
-	c := s.Collector
-
 	c.OnHTML("head > title", func(h *colly.HTMLElement) {
+		// Sanitizar el título para usarlo como nombre de fichero
+		title := strings.TrimSpace(h.Text)
+		title = strings.ReplaceAll(title, "/", "-")
+		title = strings.ReplaceAll(title, " ", "_")
+
+		if title == "" {
+			title = url
+		}
+
+		var err error
+		f, err = os.Create(fmt.Sprintf("files/%s.md", title))
+		if err != nil {
+			panic(err)
+		}
+
 		fmt.Fprintf(f, "# %s\n*Source: %s*\n\n", h.Text, url)
 	})
 
 	c.OnHTML("main", func(h *colly.HTMLElement) {
+		if f == nil {
+			var err error
+			f, err = os.Create(fmt.Sprintf("files/%s.md", url))
+			if err != nil {
+				panic(err)
+			}
+		}
+
 		dom := h.DOM.Clone()
 		dom.Find("nav, button, svg, header, footer, .banner, .ad").Remove()
-
-		dom.Find("div").Each(func(i int, s *goquery.Selection) {
-			text := strings.TrimSpace(s.Text())
+		dom.Find("div").Each(func(i int, sel *goquery.Selection) {
+			text := strings.TrimSpace(sel.Text())
 			if text != "" {
 				f.WriteString(text)
 				f.WriteString("\n")
@@ -59,8 +78,8 @@ func (s *Scraper) Scrape(url string) {
 	})
 
 	c.AllowedDomains = []string{}
-
 	if err := c.Visit(url); err != nil {
-		fmt.Println("Error:", err)
+		log.Fatal("Error:", err)
 	}
+
 }

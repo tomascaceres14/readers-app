@@ -14,19 +14,19 @@ func main() {
 
 	scraper := scraping.NewScraper()
 	consumerCfg := messaging.NewConsumerConfig()
-	scrapeQ, err := messaging.NewScrapingConsumer(consumerCfg, scraper)
+	consumer, err := messaging.NewScrapingConsumer(consumerCfg, scraper)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := scrapeQ.Setup(); err != nil {
+	if err := consumer.Setup(); err != nil {
 		log.Fatal(err)
 	}
-	scrapeQ.Listen()
+	consumer.Listen()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	scrapeQ.Close()
+	consumer.Close()
 }

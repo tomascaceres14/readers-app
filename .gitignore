@@ -44,3 +44,6 @@ package-lock.json
 
 # Firebase
 backend-service/private_keys.json
+
+# Scraping output
+resource-service/files

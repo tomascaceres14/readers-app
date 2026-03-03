@@ -54,7 +54,7 @@ func NewScrapingConsumer(cfg ConsumerConfig, scraper *scraping.Scraper) (*Scrapi
 		return nil, fmt.Errorf("failed to open channel: %w", err)
 	}
 
-	return &ScrapingConsumer{conn: conn, channel: ch, config: cfg}, nil
+	return &ScrapingConsumer{conn: conn, channel: ch, config: cfg, scraper: scraper}, nil
 }
 
 func (c *ScrapingConsumer) Setup() error {
@@ -112,9 +112,7 @@ func (c *ScrapingConsumer) Listen() error {
 		}
 
 		fmt.Printf("Received message: %+v\n", message)
-		fmt.Printf("  UserID: %s\n", message.UserID)
-		fmt.Printf("  ResourceID: %s\n", message.ResourceID)
-		fmt.Printf("  URL: %s\n", message.URL)
+		c.scraper.Scrape(message.URL)
 	}
 
 	return nil
