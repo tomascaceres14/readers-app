@@ -15,12 +15,9 @@ type Scraper struct {
 }
 
 func NewScraper() *Scraper {
-
-	scraper := &Scraper{
-		Collector: colly.NewCollector(),
-	}
-
-	scraper.Collector.OnRequest(func(r *colly.Request) {
+	c := colly.NewCollector()
+	c.AllowedDomains = []string{}
+	c.OnRequest(func(r *colly.Request) {
 		r.Headers.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 		r.Headers.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8")
 		r.Headers.Set("Accept-Language", "en-US,en;q=0.9")
@@ -30,7 +27,9 @@ func NewScraper() *Scraper {
 		r.Headers.Set("Referer", "https://www.google.com/")
 	})
 
-	return scraper
+	return &Scraper{
+		Collector: c,
+	}
 }
 
 func (s *Scraper) Scrape(url string) {
@@ -57,6 +56,25 @@ func (s *Scraper) Scrape(url string) {
 		fmt.Fprintf(f, "# %s\n*Source: %s*\n\n", h.Text, url)
 	})
 
+	c.OnHTML("article", func(h *colly.HTMLElement) {
+		if f == nil {
+			var err error
+			f, err = os.Create(fmt.Sprintf("files/%s.md", url))
+			if err != nil {
+				panic(err)
+			}
+		}
+
+		dom := h.DOM.Clone()
+		dom.Find("nav, button, svg, header, footer, .banner, .ad, figure, h1").Remove()
+		dom.Find("div").Each(func(i int, sel *goquery.Selection) {
+			text := strings.TrimSpace(sel.Text())
+			if text != "" {
+				fmt.Fprintf(f, "%s\n", text)
+			}
+		})
+	})
+
 	c.OnHTML("main", func(h *colly.HTMLElement) {
 		if f == nil {
 			var err error
@@ -67,17 +85,15 @@ func (s *Scraper) Scrape(url string) {
 		}
 
 		dom := h.DOM.Clone()
-		dom.Find("nav, button, svg, header, footer, .banner, .ad").Remove()
+		dom.Find("nav, button, svg, header, footer, .banner, .ad, figure, h1").Remove()
 		dom.Find("div").Each(func(i int, sel *goquery.Selection) {
 			text := strings.TrimSpace(sel.Text())
 			if text != "" {
-				f.WriteString(text)
-				f.WriteString("\n")
+				fmt.Fprintf(f, "%s\n", text)
 			}
 		})
 	})
 
-	c.AllowedDomains = []string{}
 	if err := c.Visit(url); err != nil {
 		log.Fatal("Error:", err)
 	}

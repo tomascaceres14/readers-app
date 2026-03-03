@@ -22,6 +22,7 @@ func main() {
 	if err := consumer.Setup(); err != nil {
 		log.Fatal(err)
 	}
+
 	consumer.Listen()
 
 	quit := make(chan os.Signal, 1)
