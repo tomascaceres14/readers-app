@@ -1,14 +1,14 @@
-module github.com/tomascaceres14/readers-app/content-service
+module github.com/tomascaceres14/readers-app/resource-service
 
 go 1.25.5
 
 require (
+	github.com/PuerkitoBio/goquery v1.11.0
 	github.com/gocolly/colly v1.2.0
 	github.com/rabbitmq/amqp091-go v1.10.0
 )
 
 require (
-	github.com/PuerkitoBio/goquery v1.11.0 // indirect
 	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/antchfx/htmlquery v1.3.5 // indirect
 	github.com/antchfx/xmlquery v1.5.0 // indirect

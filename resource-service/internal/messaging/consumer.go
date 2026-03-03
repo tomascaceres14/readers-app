@@ -1,31 +1,30 @@
 package messaging
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
-	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/tomascaceres14/readers-app/content-service/utils"
+	"github.com/tomascaceres14/readers-app/resource-service/internal/scraping"
+	"github.com/tomascaceres14/readers-app/resource-service/utils"
 )
 
-type RabbitConfig struct {
+type ConsumerConfig struct {
 	URL          string
 	Exchange     string
-	Queue        string
-	RoutingKey   string
 	ExchangeType string
+	BindingKey   string
+	Queue        string
 }
 
-func NewRabbitConfig() RabbitConfig {
-	return RabbitConfig{
+func NewConsumerConfig() ConsumerConfig {
+	return ConsumerConfig{
 		URL:          utils.GetEnv("RABBITMQ_URL", "amqp://admin:admin@localhost:5672/"),
 		Exchange:     utils.GetEnv("RABBITMQ_EXCHANGE", "scraping.exchange"),
-		Queue:        utils.GetEnv("RABBITMQ_QUEUE", "scraping.queue"),
-		RoutingKey:   utils.GetEnv("RABBITMQ_ROUTING_KEY", "scrape"),
-		ExchangeType: utils.GetEnv("RABBITMQ_EXCHANGE_TYPE", amqp.ExchangeTopic),
+		ExchangeType: utils.GetEnv("RABBITMQ_EXCHANGE_TYPE", "topic"),
+		BindingKey:   utils.GetEnv("RABBITMQ_CONSUMER_BINDING_KEY", "scraping.request"),
+		Queue:        utils.GetEnv("RABBITMQ_CONSUMER_QUEUE", "scraping.requests"),
 	}
 }
 
@@ -35,16 +34,16 @@ type Message struct {
 	URL        string `json:"url"`
 }
 
-type Consumer struct {
+type ScrapingConsumer struct {
 	conn    *amqp.Connection
 	channel *amqp.Channel
-	config  RabbitConfig
+	scraper *scraping.Scraper
+	config  ConsumerConfig
 }
 
-func NewConsumer() (*Consumer, error) {
-	config := NewRabbitConfig()
+func NewScrapingConsumer(cfg ConsumerConfig, scraper *scraping.Scraper) (*ScrapingConsumer, error) {
 
-	conn, err := amqp.Dial(config.URL)
+	conn, err := amqp.Dial(cfg.URL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to RabbitMQ: %w", err)
 	}
@@ -55,18 +54,14 @@ func NewConsumer() (*Consumer, error) {
 		return nil, fmt.Errorf("failed to open channel: %w", err)
 	}
 
-	return &Consumer{conn: conn, channel: ch, config: config}, nil
+	return &ScrapingConsumer{conn: conn, channel: ch, config: cfg}, nil
 }
 
-func (c *Consumer) Setup() error {
+func (c *ScrapingConsumer) Setup() error {
 	err := c.channel.ExchangeDeclare(
 		c.config.Exchange,
 		c.config.ExchangeType,
-		true,
-		false,
-		false,
-		false,
-		nil,
+		true, false, false, false, nil,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to declare exchange: %w", err)
@@ -74,11 +69,7 @@ func (c *Consumer) Setup() error {
 
 	_, err = c.channel.QueueDeclare(
 		c.config.Queue,
-		true,
-		false,
-		false,
-		false,
-		nil,
+		true, false, false, false, nil,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to declare queue: %w", err)
@@ -86,19 +77,18 @@ func (c *Consumer) Setup() error {
 
 	err = c.channel.QueueBind(
 		c.config.Queue,
-		c.config.RoutingKey,
+		c.config.BindingKey,
 		c.config.Exchange,
-		false,
-		nil,
+		false, nil,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to bind queue: %w", err)
 	}
 
-	return nil
+	return c.channel.Qos(1, 0, false)
 }
 
-func (c *Consumer) Listen() error {
+func (c *ScrapingConsumer) Listen() error {
 	msgs, err := c.channel.Consume(
 		c.config.Queue,
 		"",
@@ -112,7 +102,7 @@ func (c *Consumer) Listen() error {
 		return fmt.Errorf("failed to register consumer: %w", err)
 	}
 
-	log.Println("Consumer started, waiting for messages...")
+	fmt.Println("Consumer started, waiting for messages...")
 
 	for msg := range msgs {
 		var message Message
@@ -130,32 +120,11 @@ func (c *Consumer) Listen() error {
 	return nil
 }
 
-func (c *Consumer) Close() {
+func (c *ScrapingConsumer) Close() {
 	if c.channel != nil {
 		c.channel.Close()
 	}
 	if c.conn != nil {
 		c.conn.Close()
 	}
-}
-
-func main() {
-	consumer, err := NewConsumer()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer consumer.Close()
-
-	if err := consumer.Setup(); err != nil {
-		log.Fatal(err)
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	if err := consumer.Listen(); err != nil {
-		log.Fatal(err)
-	}
-
-	<-ctx.Done()
 }

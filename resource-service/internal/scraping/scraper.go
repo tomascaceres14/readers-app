@@ -1,6 +1,13 @@
 package scraping
 
-import "github.com/gocolly/colly"
+import (
+	"fmt"
+	"os"
+	"strings"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/gocolly/colly"
+)
 
 type Scraper struct {
 	Collector *colly.Collector
@@ -23,4 +30,37 @@ func NewScraper() *Scraper {
 	})
 
 	return scraper
+}
+
+func (s *Scraper) Scrape(url string) {
+	f, err := os.Create("files/sample.md")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	c := s.Collector
+
+	c.OnHTML("head > title", func(h *colly.HTMLElement) {
+		fmt.Fprintf(f, "# %s\n*Source: %s*\n\n", h.Text, url)
+	})
+
+	c.OnHTML("main", func(h *colly.HTMLElement) {
+		dom := h.DOM.Clone()
+		dom.Find("nav, button, svg, header, footer, .banner, .ad").Remove()
+
+		dom.Find("div").Each(func(i int, s *goquery.Selection) {
+			text := strings.TrimSpace(s.Text())
+			if text != "" {
+				f.WriteString(text)
+				f.WriteString("\n")
+			}
+		})
+	})
+
+	c.AllowedDomains = []string{}
+
+	if err := c.Visit(url); err != nil {
+		fmt.Println("Error:", err)
+	}
 }
