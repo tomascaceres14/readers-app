@@ -22,7 +22,7 @@ func main() {
 	if err := consumer.Setup(); err != nil {
 		log.Fatal(err)
 	}
-	url := "https://nleiva.medium.com/learn-go-45d4b9c177c7"
+	url := "https://go.dev/doc/effective_go"
 
 	if err := scraper.Scrape(url); err != nil {
 		log.Fatal(err)
