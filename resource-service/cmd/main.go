@@ -22,7 +22,7 @@ func main() {
 	if err := consumer.Setup(); err != nil {
 		log.Fatal(err)
 	}
-	url := "https://www.uber.com/en-PL/blog/data-race-patterns-in-go/"
+	url := "https://nleiva.medium.com/learn-go-45d4b9c177c7"
 
 	if err := scraper.Scrape(url); err != nil {
 		log.Fatal(err)

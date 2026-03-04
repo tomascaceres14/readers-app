@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/go-shiori/go-readability"
+	readability "codeberg.org/readeck/go-readability/v2"
 	"github.com/gocolly/colly/v2"
 )
 
@@ -53,7 +53,7 @@ func (s *Scraper) Scrape(fetchUrl string) error {
 		return fmt.Errorf("failed to parse content: %w", err)
 	}
 
-	filename := strings.ReplaceAll(article.Title, " ", "_")
+	filename := strings.ReplaceAll(article.Title(), " ", "_")
 	filename = strings.ReplaceAll(filename, "/", "_")
 
 	f, err := os.Create(fmt.Sprintf("files/%s.md", filename))
@@ -62,11 +62,13 @@ func (s *Scraper) Scrape(fetchUrl string) error {
 	}
 	defer f.Close()
 
-	_, err = fmt.Fprintf(f, "# %s\n### %s\n*Source: %s*\n\n%s\n",
-		article.Title,
-		article.Excerpt,
+	_, err = fmt.Fprintf(f, "# %s\n### %s\n*Source: %s*\n\n",
+		article.Title(),
+		article.Excerpt(),
 		fetchUrl,
-		article.TextContent,
 	)
+
+	article.RenderText(f)
+
 	return err
 }

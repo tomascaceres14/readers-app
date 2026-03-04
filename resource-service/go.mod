@@ -8,6 +8,7 @@ require (
 )
 
 require (
+	codeberg.org/readeck/go-readability/v2 v2.1.1 // indirect
 	github.com/PuerkitoBio/goquery v1.11.0 // indirect
 	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/antchfx/htmlquery v1.3.5 // indirect
