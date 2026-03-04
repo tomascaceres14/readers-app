@@ -22,12 +22,7 @@ func main() {
 	if err := consumer.Setup(); err != nil {
 		log.Fatal(err)
 	}
-	url := "https://go.dev/doc/effective_go"
 
-	if err := scraper.Scrape(url); err != nil {
-		log.Fatal(err)
-	}
-	os.Exit(0)
 	consumer.Listen()
 
 	quit := make(chan os.Signal, 1)

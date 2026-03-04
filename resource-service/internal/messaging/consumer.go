@@ -112,7 +112,9 @@ func (c *ScrapingConsumer) Listen() error {
 		}
 
 		fmt.Printf("Received message: %+v\n", message)
-		c.scraper.Scrape(message.URL)
+		if err := c.scraper.Scrape(message.URL); err != nil {
+			fmt.Println("Error scraping: ", err)
+		}
 	}
 
 	return nil
