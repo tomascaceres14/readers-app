@@ -102,15 +102,21 @@ func (s *Service) DeleteAll() {
 }
 
 func cleanURL(rawURL string) (string, error) {
-	if !strings.Contains(rawURL, ".com") {
-		return "", errs.ErrBadRequest
-	}
-
 	u, err := url.Parse(rawURL)
 	if err != nil {
 		return "", err
 	}
 
-	host := strings.TrimPrefix(u.Host, "www.")
-	return host + u.Path, nil
+	if u.Scheme != "https" {
+		return "", errs.ErrBadURL
+	}
+
+	if u.Host == "" || !strings.Contains(u.Host, ".") {
+		return "", errs.ErrBadURL
+	}
+
+	u.RawQuery = ""
+	u.Fragment = ""
+
+	return u.String(), nil
 }

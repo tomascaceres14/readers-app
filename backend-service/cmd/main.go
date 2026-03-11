@@ -56,6 +56,17 @@ func main() {
 	}
 	defer publisher.Close()
 
+	responseConsumerCfg := messaging.NewResponseConfig()
+	responseConsumer, err := messaging.NewResponseConsumer(responseConsumerCfg, db)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := responseConsumer.Setup(); err != nil {
+		log.Fatal(err)
+	}
+	go responseConsumer.Listen()
+	defer responseConsumer.Close()
+
 	// Users
 	usrRepo := user.NewRepository(db)
 	usrSvc := user.NewService(usrRepo)

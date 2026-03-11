@@ -57,3 +57,20 @@ func (r *Repository) FindByUrl(url string) (*Resource, error) {
 func (r *Repository) DeleteAll() {
 	r.db.Where("1 = 1").Delete(&Resource{})
 }
+
+func (r *Repository) UpdateAfterScrape(id uuid.UUID, statusID uuid.UUID, title, excerpt, language string) error {
+	updates := map[string]any{
+		"status_id": statusID,
+		"title":     title,
+		"excerpt":   excerpt,
+		"language":  language,
+	}
+	return r.db.Model(&Resource{}).Where("id = ?", id).Updates(updates).Error
+}
+
+func (r *Repository) UpdateStatusFailed(id uuid.UUID, statusID uuid.UUID) error {
+	updates := map[string]any{
+		"status_id": statusID,
+	}
+	return r.db.Model(&Resource{}).Where("id = ?", id).Updates(updates).Error
+}
