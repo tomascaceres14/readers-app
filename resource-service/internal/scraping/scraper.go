@@ -14,6 +14,12 @@ type Scraper struct {
 	Collector *colly.Collector
 }
 
+type ScrapeResult struct {
+	Title    string
+	Excerpt  string
+	Language string
+}
+
 func NewScraper() *Scraper {
 	c := colly.NewCollector(
 		colly.UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"),
@@ -34,7 +40,7 @@ func NewScraper() *Scraper {
 	}
 }
 
-func (s *Scraper) Scrape(fetchUrl string) error {
+func (s *Scraper) Scrape(fetchUrl string) (*ScrapeResult, error) {
 	c := colly.NewCollector()
 	var htmlContent string
 
@@ -43,17 +49,17 @@ func (s *Scraper) Scrape(fetchUrl string) error {
 	})
 
 	if err := c.Visit(fetchUrl); err != nil {
-		return fmt.Errorf("failed to visit url: %w", err)
+		return nil, fmt.Errorf("failed to visit url: %w", err)
 	}
 
 	parsedUrl, err := url.Parse(fetchUrl)
 	if err != nil {
-		return fmt.Errorf("failed to parse url: %w", err)
+		return nil, fmt.Errorf("failed to parse url: %w", err)
 	}
 
 	article, err := readability.FromReader(strings.NewReader(htmlContent), parsedUrl)
 	if err != nil {
-		return fmt.Errorf("failed to parse content: %w", err)
+		return nil, fmt.Errorf("failed to parse content: %w", err)
 	}
 
 	filename := strings.ReplaceAll(article.Title(), " ", "_")
@@ -61,7 +67,7 @@ func (s *Scraper) Scrape(fetchUrl string) error {
 
 	f, err := os.Create(fmt.Sprintf("files/%s.md", filename))
 	if err != nil {
-		return fmt.Errorf("failed to create file: %w", err)
+		return nil, fmt.Errorf("failed to create file: %w", err)
 	}
 	defer f.Close()
 
@@ -73,5 +79,13 @@ func (s *Scraper) Scrape(fetchUrl string) error {
 
 	article.RenderText(f)
 
-	return err
+	if err != nil {
+		return nil, err
+	}
+
+	return &ScrapeResult{
+		Title:    article.Title(),
+		Excerpt:  article.Excerpt(),
+		Language: article.Language(),
+	}, nil
 }

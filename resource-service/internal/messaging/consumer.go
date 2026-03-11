@@ -35,13 +35,14 @@ type Message struct {
 }
 
 type ScrapingConsumer struct {
-	conn    *amqp.Connection
-	channel *amqp.Channel
-	scraper *scraping.Scraper
-	config  ConsumerConfig
+	conn      *amqp.Connection
+	channel   *amqp.Channel
+	scraper   *scraping.Scraper
+	publisher *Publisher
+	config    ConsumerConfig
 }
 
-func NewScrapingConsumer(cfg ConsumerConfig, scraper *scraping.Scraper) (*ScrapingConsumer, error) {
+func NewScrapingConsumer(cfg ConsumerConfig, scraper *scraping.Scraper, publisher *Publisher) (*ScrapingConsumer, error) {
 
 	conn, err := amqp.Dial(cfg.URL)
 	if err != nil {
@@ -54,7 +55,7 @@ func NewScrapingConsumer(cfg ConsumerConfig, scraper *scraping.Scraper) (*Scrapi
 		return nil, fmt.Errorf("failed to open channel: %w", err)
 	}
 
-	return &ScrapingConsumer{conn: conn, channel: ch, config: cfg, scraper: scraper}, nil
+	return &ScrapingConsumer{conn: conn, channel: ch, config: cfg, scraper: scraper, publisher: publisher}, nil
 }
 
 func (c *ScrapingConsumer) Setup() error {
@@ -112,9 +113,24 @@ func (c *ScrapingConsumer) Listen() error {
 		}
 
 		fmt.Printf("Received message: %+v\n", message)
-		if err := c.scraper.Scrape(message.URL); err != nil {
+
+		result, err := c.scraper.Scrape(message.URL)
+		if err != nil {
 			fmt.Println("Error scraping: ", err)
+			c.publisher.PublishResponse(ResponseMessage{
+				ResourceID: message.ResourceID,
+				Status:     StatusFAILED,
+			})
+			continue
 		}
+
+		c.publisher.PublishResponse(ResponseMessage{
+			ResourceID: message.ResourceID,
+			Status:     StatusOK,
+			Title:      result.Title,
+			Excerpt:    result.Excerpt,
+			Language:   result.Language,
+		})
 	}
 
 	return nil
