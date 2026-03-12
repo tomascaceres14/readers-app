@@ -12,6 +12,7 @@ var (
 	ErrUnauthorized  = errors.New("unauthorized")
 	ErrInternal      = errors.New("internal")
 	ErrAlreadyExists = errors.New("already exists")
+	ErrBadURL        = errors.New("url does not contain ")
 )
 
 type AppError struct {

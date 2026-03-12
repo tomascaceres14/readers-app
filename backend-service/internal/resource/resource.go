@@ -12,6 +12,8 @@ type Resource struct {
 	ID        uuid.UUID                     `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 	Url       string                        `json:"url"`
 	Title     string                        `json:"title"`
+	Excerpt   string                        `json:"excerpt"`
+	Language  string                        `gorm:"type:varchar(10)" json:"language"`
 	StatusID  uuid.UUID                     `gorm:"type:uuid;column:status_id" json:"status_id"`
 	Status    resourcestatus.ResourceStatus `json:"status" gorm:"foreignKey:StatusID;references:ID"`
 	CreatedAt time.Time                     `json:"created_at"`

@@ -13,8 +13,18 @@ import (
 func main() {
 
 	scraper := scraping.NewScraper()
+
+	publisherCfg := messaging.NewPublisherConfig()
+	publisher, err := messaging.NewPublisher(publisherCfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := publisher.Setup(); err != nil {
+		log.Fatal(err)
+	}
+
 	consumerCfg := messaging.NewConsumerConfig()
-	consumer, err := messaging.NewScrapingConsumer(consumerCfg, scraper)
+	consumer, err := messaging.NewScrapingConsumer(consumerCfg, scraper, publisher)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,4 +40,5 @@ func main() {
 	<-quit
 
 	consumer.Close()
+	publisher.Close()
 }

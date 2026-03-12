@@ -9,6 +9,7 @@ import (
 const (
 	OK      = "OK"
 	PENDING = "PENDING"
+	FAILED  = "FAILED"
 	ERROR   = "ERROR"
 )
 

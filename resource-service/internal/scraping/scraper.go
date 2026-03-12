@@ -2,27 +2,35 @@ package scraping
 
 import (
 	"fmt"
-	"log"
+	"net/url"
 	"os"
 	"strings"
 
-	"github.com/PuerkitoBio/goquery"
-	"github.com/gocolly/colly"
+	readability "codeberg.org/readeck/go-readability/v2"
+	"github.com/gocolly/colly/v2"
 )
 
 type Scraper struct {
 	Collector *colly.Collector
 }
 
+type ScrapeResult struct {
+	Title    string
+	Excerpt  string
+	Language string
+}
+
 func NewScraper() *Scraper {
-	c := colly.NewCollector()
+	c := colly.NewCollector(
+		colly.UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"),
+	)
 	c.AllowedDomains = []string{}
+
 	c.OnRequest(func(r *colly.Request) {
-		r.Headers.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-		r.Headers.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8")
-		r.Headers.Set("Accept-Language", "en-US,en;q=0.9")
+		r.Headers.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+		r.Headers.Set("Accept-Language", "en-US,en;q=0.5")
 		r.Headers.Set("Accept-Encoding", "gzip, deflate, br")
-		r.Headers.Set("Sec-Ch-Ua", "\"Not_A Brand\";v=\"8\", \"Chromium\";v=\"120\", \"Google Chrome\";v=\"120\"")
+		r.Headers.Set("Sec-Ch-Ua", `"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"`)
 		r.Headers.Set("Sec-Fetch-Mode", "navigate")
 		r.Headers.Set("Referer", "https://www.google.com/")
 	})
@@ -32,70 +40,52 @@ func NewScraper() *Scraper {
 	}
 }
 
-func (s *Scraper) Scrape(url string) {
-	c := s.Collector
-	var f *os.File
-	defer f.Close()
+func (s *Scraper) Scrape(fetchUrl string) (*ScrapeResult, error) {
+	c := colly.NewCollector()
+	var htmlContent string
 
-	c.OnHTML("head > title", func(h *colly.HTMLElement) {
-		// Sanitizar el título para usarlo como nombre de fichero
-		title := strings.TrimSpace(h.Text)
-		title = strings.ReplaceAll(title, "/", "-")
-		title = strings.ReplaceAll(title, " ", "_")
-
-		if title == "" {
-			title = url
-		}
-
-		var err error
-		f, err = os.Create(fmt.Sprintf("files/%s.md", title))
-		if err != nil {
-			panic(err)
-		}
-
-		fmt.Fprintf(f, "# %s\n*Source: %s*\n\n", h.Text, url)
+	c.OnResponse(func(r *colly.Response) {
+		htmlContent = string(r.Body)
 	})
 
-	c.OnHTML("article", func(h *colly.HTMLElement) {
-		if f == nil {
-			var err error
-			f, err = os.Create(fmt.Sprintf("files/%s.md", url))
-			if err != nil {
-				panic(err)
-			}
-		}
-
-		dom := h.DOM.Clone()
-		dom.Find("nav, button, svg, header, footer, .banner, .ad, figure, h1").Remove()
-		dom.Find("div").Each(func(i int, sel *goquery.Selection) {
-			text := strings.TrimSpace(sel.Text())
-			if text != "" {
-				fmt.Fprintf(f, "%s\n", text)
-			}
-		})
-	})
-
-	c.OnHTML("main", func(h *colly.HTMLElement) {
-		if f == nil {
-			var err error
-			f, err = os.Create(fmt.Sprintf("files/%s.md", url))
-			if err != nil {
-				panic(err)
-			}
-		}
-
-		dom := h.DOM.Clone()
-		dom.Find("nav, button, svg, header, footer, .banner, .ad, figure, h1").Remove()
-		dom.Find("div").Each(func(i int, sel *goquery.Selection) {
-			text := strings.TrimSpace(sel.Text())
-			if text != "" {
-				fmt.Fprintf(f, "%s\n", text)
-			}
-		})
-	})
-
-	if err := c.Visit(url); err != nil {
-		log.Fatal("Error:", err)
+	if err := c.Visit(fetchUrl); err != nil {
+		return nil, fmt.Errorf("failed to visit url: %w", err)
 	}
 
+	parsedUrl, err := url.Parse(fetchUrl)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse url: %w", err)
+	}
+
+	article, err := readability.FromReader(strings.NewReader(htmlContent), parsedUrl)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse content: %w", err)
+	}
+
+	filename := strings.ReplaceAll(article.Title(), " ", "_")
+	filename = strings.ReplaceAll(filename, "/", "_")
+
+	f, err := os.Create(fmt.Sprintf("files/%s.md", filename))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create file: %w", err)
+	}
+	defer f.Close()
+
+	_, err = fmt.Fprintf(f, "# %s\n### %s\n*Source: %s*\n\n",
+		article.Title(),
+		article.Excerpt(),
+		fetchUrl,
+	)
+
+	article.RenderText(f)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &ScrapeResult{
+		Title:    article.Title(),
+		Excerpt:  article.Excerpt(),
+		Language: article.Language(),
+	}, nil
 }

@@ -101,16 +101,40 @@ func (s *Service) DeleteAll() {
 	s.r.DeleteAll()
 }
 
-func cleanURL(rawURL string) (string, error) {
-	if !strings.Contains(rawURL, ".com") {
-		return "", errs.ErrBadRequest
+func (s *Service) UpdateAfterScrape(id uuid.UUID, statusName, title, excerpt, language string) error {
+	status, err := s.statusRepo.FindByName(statusName)
+	if err != nil {
+		return fmt.Errorf("failed to find status %s: %w", statusName, err)
 	}
 
+	return s.r.UpdateAfterScrape(id, status.ID, title, excerpt, language)
+}
+
+func (s *Service) UpdateStatusFailed(id uuid.UUID, statusName string) error {
+	status, err := s.statusRepo.FindByName(statusName)
+	if err != nil {
+		return fmt.Errorf("failed to find status %s: %w", statusName, err)
+	}
+
+	return s.r.UpdateStatusFailed(id, status.ID)
+}
+
+func cleanURL(rawURL string) (string, error) {
 	u, err := url.Parse(rawURL)
 	if err != nil {
 		return "", err
 	}
 
-	host := strings.TrimPrefix(u.Host, "www.")
-	return host + u.Path, nil
+	if u.Scheme != "https" {
+		return "", errs.ErrBadURL
+	}
+
+	if u.Host == "" || !strings.Contains(u.Host, ".") {
+		return "", errs.ErrBadURL
+	}
+
+	u.RawQuery = ""
+	u.Fragment = ""
+
+	return u.String(), nil
 }

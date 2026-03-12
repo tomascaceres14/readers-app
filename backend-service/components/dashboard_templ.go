@@ -5,12 +5,11 @@ package components
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
-import (
-	"github.com/a-h/templ"
-	templruntime "github.com/a-h/templ/runtime"
-	"github.com/tomascaceres14/readers-app/backend-service/internal/resource"
-	"github.com/tomascaceres14/readers-app/backend-service/internal/user"
-)
+import "github.com/a-h/templ"
+import templruntime "github.com/a-h/templ/runtime"
+
+import "github.com/tomascaceres14/readers-app/backend-service/internal/user"
+import "github.com/tomascaceres14/readers-app/backend-service/internal/resource"
 
 func Dashboard(u *user.User) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -58,7 +57,7 @@ func Dashboard(u *user.User) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</h2><div class=\"flex flex-col items-center w-full\"><form hx-post=\"/api/resource\" hx-target=\"#resources-list\" hx-swap=\"afterbegin\" class=\"flex gap-2 w-90\"><input type=\"text\" placeholder=\"What are we scraping?\" class=\"input input-bordered flex-1\" name=\"url\"> <button class=\"btn btn-accent\">Scrape!</button></form><div class=\"text-green-600 absolute top-full mt-2\" id=\"scrape-result\"></div></div><div class=\"flex flex-col gap-2 self-center\"><h3>Your Links</h3><ul id=\"resources-list\" class=\"flex flex-col gap-2\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</h2><div class=\"flex flex-col items-center w-full\"><form hx-post=\"/api/resource\" hx-target=\"#resources-list\" hx-swap=\"afterbegin\" class=\"flex gap-2 w-90\"><input type=\"text\" placeholder=\"What are we scraping?\" class=\"input input-bordered flex-1\" name=\"url\"> <button class=\"btn btn-accent\">Scrape!</button></form><div class=\"text-green-600 absolute top-full mt-2\" id=\"scrape-result\"></div></div><div class=\"flex flex-col gap-2 self-center\"><ul id=\"resources-list\" class=\"flex flex-col gap-2\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
