@@ -15,7 +15,12 @@ templ ExistsMessage() {
 	<p hx-swap-oob="true" id="scrape-result" class="text-yellow-600">resource already exist!</p>
 }
 
+templ RemoveEmptyMessage() {
+	<p hx-swap-oob="delete" id="empty-resource-list-message"></p>
+}
+
 templ SuccessCreateResource(r Resource) {
+	@RemoveEmptyMessage()
 	@SuccessMessage()
 	@ResourceItem(r)
 }

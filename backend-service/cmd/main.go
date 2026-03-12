@@ -47,6 +47,7 @@ func main() {
 	urRepo := userresources.NewRepository(db)
 	statusRepo := resourcestatus.NewRepository(db)
 
+	// Resources + Messaging
 	publisher, err := messaging.NewPublisher()
 	if err != nil {
 		log.Fatal(err)

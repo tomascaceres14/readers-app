@@ -78,7 +78,6 @@ func (s *Service) Create(resource *Resource, uid string) error {
 		URL:        resource.Url,
 	}
 
-	fmt.Println("msg:", msg)
 	if err := s.publisher.PublishScrapingTask(msg); err != nil {
 		return err
 	}

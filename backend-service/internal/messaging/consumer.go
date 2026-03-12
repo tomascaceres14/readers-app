@@ -121,8 +121,6 @@ func (c *ResponseConsumer) Listen() error {
 			continue
 		}
 
-		fmt.Printf("Received response: %+v\n", resp)
-
 		resourceID, err := uuid.Parse(resp.ResourceID)
 		if err != nil {
 			log.Printf("Failed to parse resource ID: %v", err)

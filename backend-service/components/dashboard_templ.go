@@ -62,7 +62,7 @@ func Dashboard(u *user.User) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if len(u.Resources) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<p class=\"text-gray-500\">No links yet</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<p class=\"text-gray-500\" id=\"empty-resource-list-message\">No links yet</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
