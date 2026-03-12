@@ -11,5 +11,6 @@ INSERT INTO resources_status (name) VALUES ('PENDING'), ('OK'), ('FAILED');
 
 -- +goose Down
 -- +goose StatementBegin
+DROP TABLE IF EXISTS resources CASCADE;
 DROP TABLE IF EXISTS resources_status;
 -- +goose StatementEnd
