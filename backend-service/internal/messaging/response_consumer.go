@@ -9,7 +9,6 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 	resourcestatus "github.com/tomascaceres14/readers-app/backend-service/internal/resource_status"
 	"github.com/tomascaceres14/readers-app/backend-service/utils"
-	"gorm.io/gorm"
 )
 
 type ResponseConfig struct {
@@ -39,14 +38,18 @@ type ResponseMessage struct {
 }
 
 type ResponseConsumer struct {
-	conn       *amqp.Connection
-	channel    *amqp.Channel
-	config     ResponseConfig
-	db         *gorm.DB
-	statusRepo *resourcestatus.Repository
+	conn        *amqp.Connection
+	channel     *amqp.Channel
+	config      ResponseConfig
+	resourceSvc ResourceUpdater
 }
 
-func NewResponseConsumer(cfg ResponseConfig, db *gorm.DB) (*ResponseConsumer, error) {
+type ResourceUpdater interface {
+	UpdateAfterScrape(id uuid.UUID, statusName, title, excerpt, language string) error
+	UpdateStatusFailed(id uuid.UUID, statusName string) error
+}
+
+func NewResponseConsumer(cfg ResponseConfig, resourceSvc ResourceUpdater) (*ResponseConsumer, error) {
 	conn, err := amqp.Dial(cfg.URL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to RabbitMQ: %w", err)
@@ -59,11 +62,10 @@ func NewResponseConsumer(cfg ResponseConfig, db *gorm.DB) (*ResponseConsumer, er
 	}
 
 	return &ResponseConsumer{
-		conn:       conn,
-		channel:    ch,
-		config:     cfg,
-		db:         db,
-		statusRepo: resourcestatus.NewRepository(db),
+		conn:        conn,
+		channel:     ch,
+		config:      cfg,
+		resourceSvc: resourceSvc,
 	}, nil
 }
 
@@ -146,18 +148,7 @@ func (c *ResponseConsumer) handleResponse(resourceID uuid.UUID, resp ResponseMes
 }
 
 func (c *ResponseConsumer) handleSuccess(resourceID uuid.UUID, resp ResponseMessage) error {
-	status, err := c.statusRepo.FindByName(resourcestatus.OK)
-	if err != nil {
-		return fmt.Errorf("failed to find OK status: %w", err)
-	}
-
-	updates := map[string]any{
-		"status_id": status.ID,
-		"title":     resp.Title,
-		"excerpt":   resp.Excerpt,
-		"language":  resp.Language,
-	}
-	if err := c.db.Table("resources").Where("id = ?", resourceID).Updates(updates).Error; err != nil {
+	if err := c.resourceSvc.UpdateAfterScrape(resourceID, resourcestatus.OK, resp.Title, resp.Excerpt, resp.Language); err != nil {
 		return fmt.Errorf("failed to update resource: %w", err)
 	}
 
@@ -165,12 +156,7 @@ func (c *ResponseConsumer) handleSuccess(resourceID uuid.UUID, resp ResponseMess
 }
 
 func (c *ResponseConsumer) handleFailure(resourceID uuid.UUID) error {
-	status, err := c.statusRepo.FindByName(resourcestatus.FAILED)
-	if err != nil {
-		return fmt.Errorf("failed to find FAILED status: %w", err)
-	}
-
-	if err := c.db.Table("resources").Where("id = ?", resourceID).Update("status_id", status.ID).Error; err != nil {
+	if err := c.resourceSvc.UpdateStatusFailed(resourceID, resourcestatus.FAILED); err != nil {
 		return fmt.Errorf("failed to update resource status to FAILED: %w", err)
 	}
 

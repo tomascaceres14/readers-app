@@ -56,8 +56,11 @@ func main() {
 	}
 	defer publisher.Close()
 
+	rscRepo := resource.NewRepository(db)
+	rscSvc := resource.NewService(rscRepo, urRepo, statusRepo, publisher)
+
 	responseConsumerCfg := messaging.NewResponseConfig()
-	responseConsumer, err := messaging.NewResponseConsumer(responseConsumerCfg, db)
+	responseConsumer, err := messaging.NewResponseConsumer(responseConsumerCfg, rscSvc)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -74,8 +77,6 @@ func main() {
 	user.RegisterRoutes(app, usrHandler)
 
 	// Resources
-	rscRepo := resource.NewRepository(db)
-	rscSvc := resource.NewService(rscRepo, urRepo, statusRepo, publisher)
 	rscHandler := resource.NewHandler(rscSvc)
 	resource.RegisterRoutes(app, rscHandler, sessionMiddleware)
 
