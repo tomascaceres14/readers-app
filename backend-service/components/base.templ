@@ -12,6 +12,7 @@ templ Base(title string, head ...templ.Component) {
 			<link rel="shortcut icon" href="/favicon.ico"/>
 			<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
 			<link rel="manifest" href="/site.webmanifest"/>
+			<script src="https://unpkg.com/htmx.org@2.0.0"></script>
 			for _, v := range head {
 				@v
 			}
@@ -22,8 +23,18 @@ templ Base(title string, head ...templ.Component) {
 			}
 		</head>
 		<body>
+			<div id="global-alert"
+				class="fixed top-4 right-4 z-50 w-80 min-h-14">
+			</div>
 			{ children... }
-			<script src="https://unpkg.com/htmx.org@2.0.0"></script>
+			<script>
+				document.addEventListener('htmx:afterSwap', (e) => {
+				if (e.target.id !== 'global-alert') return;
+				if (!e.target.children.length) return;
+				clearTimeout(window._alertTimer);
+				window._alertTimer = setTimeout(() => { e.target.innerHTML = ''; }, 3000);
+				});
+			</script>
 		</body>
 	</html>
 }

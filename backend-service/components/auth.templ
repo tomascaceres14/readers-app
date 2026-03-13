@@ -23,7 +23,12 @@ templ LoginForm() {
 		<div class="card w-96 bg-base-100 card-md shadow-sm">
 			<div class="card-body">
 				<h2 class="card-title self-center">Login</h2>
-				<form id="login-form" class="flex flex-col gap-3" action="/auth/login" method="POST">
+				<form id="login-form" 
+					class="flex flex-col gap-3" 
+					hx-post="/auth/login"
+					hx-swap="innerHTML"
+					hx-target="#global-alert"
+					>
 					<div class="form-control">
 						<label class="label">
 							<span class="label-text">Email</span>
@@ -36,7 +41,7 @@ templ LoginForm() {
 						</label>
 						<input type="password" name="password" placeholder="password" class="input input-bordered" required/>
 					</div>
-					<div class="form-control mt-6">
+					<div class="mt-6">
 						<button class="btn btn-primary">Log in</button>
 					</div>
 					<input type="hidden" name="token"/>
@@ -54,7 +59,6 @@ templ LoginForm() {
 				<span>New around here? <a href="/register" class="link link-primary">Register</a></span>
 			</div>
 		</div>
-		<div id="login-error" class="text-error hidden"></div>
 	}
 }
 
@@ -63,7 +67,11 @@ templ RegisterForm() {
 		<div class="card w-96 bg-base-100 card-md shadow-sm">
 			<div class="card-body">
 				<h2 class="card-title self-center">Register</h2>
-				<form id="register-form" class="flex flex-col gap-3" action="/auth/register" method="POST">
+				<form id="register-form" 
+					class="flex flex-col gap-3" 
+					hx-post="/auth/register"
+					hx-swap="innerHTML"
+					hx-target="#global-alert">
 					<div class="form-control">
 						<label class="label">
 							<span class="label-text">Username</span>

@@ -23,9 +23,7 @@ document
       const idToken = await userCredential.user.getIdToken();
       form.password.value = "";
       form.token.value = idToken;
-      console.log(userCredential.user);
-      console.log(idToken);
-      form.submit();
+      form.requestSubmit();
     } catch (error) {
       console.error("Firebase error:", error);
     }

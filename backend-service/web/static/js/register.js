@@ -21,7 +21,7 @@ document
       const idToken = await userCredential.user.getIdToken();
       form.password.value = "";
       form.token.value = idToken;
-      form.submit();
+      form.requestSubmit();
     } catch (error) {
       console.error(error);
     }

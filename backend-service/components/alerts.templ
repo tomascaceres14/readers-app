@@ -1,0 +1,18 @@
+package components
+
+type AlertType string
+
+const (
+  AlertSuccess AlertType = "alert-success"
+  AlertError   AlertType = "alert-error"
+  AlertWarning AlertType = "alert-warning"
+  AlertInfo    AlertType = "alert-info"
+)
+
+templ GlobalAlert(t AlertType, msg string) {
+  <div id="global-alert" >
+    <div role="alert" class={ "alert fixed top-4 right-4 z-50 w-80 min-h-14", string(t) }>
+      <span>{ msg }</span>
+    </div>
+  </div>
+}

@@ -52,11 +52,12 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 }
 
 func (h *Handler) Login(c *fiber.Ctx) error {
+	return utils.Render(c, components.GlobalAlert(components.AlertError, "Ups! Invalid request."))
 
 	var cred Login
 	if err := c.BodyParser(&cred); err != nil {
 		fmt.Println(err)
-		return c.Status(400).SendString("Invalid request.")
+		return utils.Render(c, components.GlobalAlert(components.AlertError, "Invalid request."))
 	}
 
 	expiresIn := time.Hour * 24 * 14
@@ -64,7 +65,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	_, err := h.s.Auth.VerifyIDToken(context.Background(), cred.IdToken)
 	if err != nil {
 		fmt.Println(err)
-		return c.Status(400).SendString(err.Error())
+		return utils.Render(c, components.GlobalAlert(components.AlertError, "Ups! An error occured. Try again later."))
 	}
 
 	sessionCookie, err := h.s.Auth.SessionCookie(
@@ -72,11 +73,8 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 		cred.IdToken,
 		expiresIn,
 	)
-
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": "Failed to create session.",
-		})
+		return utils.Render(c, components.GlobalAlert(components.AlertError, "Failed to create session."))
 	}
 
 	c.Cookie(&fiber.Cookie{
