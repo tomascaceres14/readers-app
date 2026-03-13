@@ -52,7 +52,6 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 }
 
 func (h *Handler) Login(c *fiber.Ctx) error {
-	return utils.Render(c, components.GlobalAlert(components.AlertError, "Ups! Invalid request."))
 
 	var cred Login
 	if err := c.BodyParser(&cred); err != nil {
