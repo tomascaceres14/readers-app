@@ -2,9 +2,10 @@ package dashboard
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/tomascaceres14/readers-app/backend-service/components"
 	"github.com/tomascaceres14/readers-app/backend-service/internal/auth"
+	"github.com/tomascaceres14/readers-app/backend-service/internal/resource"
 	"github.com/tomascaceres14/readers-app/backend-service/internal/user"
+	"github.com/tomascaceres14/readers-app/backend-service/ui"
 	"github.com/tomascaceres14/readers-app/backend-service/utils"
 )
 
@@ -24,5 +25,8 @@ func (h *Handler) Dashboard(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	return utils.Render(c, components.Dashboard(usr))
+	return utils.Render(c, ui.Dashboard(&ui.User{
+		Username:  usr.Username,
+		Resources: resource.ManyToUI(usr.Resources),
+	}))
 }

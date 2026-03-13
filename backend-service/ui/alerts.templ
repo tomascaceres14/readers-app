@@ -1,4 +1,4 @@
-package components
+package ui
 
 type AlertType string
 
@@ -15,4 +15,20 @@ templ GlobalAlert(t AlertType, msg string) {
       <span>{ msg }</span>
     </div>
   </div>
+}
+
+templ GlobalSuccessAlert(msg string) {
+  @GlobalAlert(AlertSuccess, msg)
+}
+
+templ GlobalInfoAlert(msg string) {
+  @GlobalAlert(AlertInfo, msg)
+}
+
+templ GlobalWarningAlert(msg string) {
+  @GlobalAlert(AlertWarning, msg)
+}
+
+templ GlobalErrorAlert(msg string) {
+  @GlobalAlert(AlertError, msg)
 }

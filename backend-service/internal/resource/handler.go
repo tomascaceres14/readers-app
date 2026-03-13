@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/tomascaceres14/readers-app/backend-service/internal/errs"
+	"github.com/tomascaceres14/readers-app/backend-service/ui"
 	"github.com/tomascaceres14/readers-app/backend-service/utils"
 )
 
@@ -33,11 +34,16 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 	if err := h.s.Create(&resource, uid); err != nil {
 		if errors.Is(err, errs.ErrAlreadyExists) {
 			c.Status(fiber.StatusOK)
-			return utils.Render(c, ExistsMessage())
+			return utils.Render(c, ui.GlobalInfoAlert("URL already exists."))
 		}
 		return c.Status(fiber.StatusOK).SendString(err.Error())
 	}
-	return utils.Render(c, SuccessCreateResource(resource))
+
+	return utils.Render(c, ui.SuccessCreateResource(ui.Resource{
+		ID:        resource.ID,
+		Url:       resource.Url,
+		CreatedAt: resource.CreatedAt,
+	}))
 }
 
 func (h *Handler) GetAll(c *fiber.Ctx) error {

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/tomascaceres14/readers-app/backend-service/components"
+	"github.com/tomascaceres14/readers-app/backend-service/ui"
 	"github.com/tomascaceres14/readers-app/backend-service/utils"
 )
 
@@ -30,11 +30,11 @@ type Login struct {
 }
 
 func (h *Handler) RegisterView(c *fiber.Ctx) error {
-	return utils.Render(c, components.RegisterForm())
+	return utils.Render(c, ui.RegisterForm())
 }
 
 func (h *Handler) LoginView(c *fiber.Ctx) error {
-	return utils.Render(c, components.LoginForm())
+	return utils.Render(c, ui.LoginForm())
 }
 
 func (h *Handler) Register(c *fiber.Ctx) error {
@@ -56,15 +56,14 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	var cred Login
 	if err := c.BodyParser(&cred); err != nil {
 		fmt.Println(err)
-		return utils.Render(c, components.GlobalAlert(components.AlertError, "Invalid request."))
+		return utils.Render(c, ui.GlobalAlert(ui.AlertError, "Invalid request."))
 	}
 
 	expiresIn := time.Hour * 24 * 14
 
 	_, err := h.s.Auth.VerifyIDToken(context.Background(), cred.IdToken)
 	if err != nil {
-		fmt.Println(err)
-		return utils.Render(c, components.GlobalAlert(components.AlertError, "Ups! An error occured. Try again later."))
+		return utils.Render(c, ui.GlobalAlert(ui.AlertError, "Ups! An error occured. Try again later."))
 	}
 
 	sessionCookie, err := h.s.Auth.SessionCookie(
@@ -73,7 +72,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 		expiresIn,
 	)
 	if err != nil {
-		return utils.Render(c, components.GlobalAlert(components.AlertError, "Failed to create session."))
+		return utils.Render(c, ui.GlobalAlert(ui.AlertError, "Failed to create session."))
 	}
 
 	c.Cookie(&fiber.Cookie{

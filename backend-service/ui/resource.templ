@@ -1,0 +1,18 @@
+package ui
+
+templ RemoveResourcesEmptyMessage() {
+	<p hx-swap-oob="delete" id="empty-resource-list-message"></p>
+}
+
+templ SuccessCreateResource(r Resource) {
+	@RemoveResourcesEmptyMessage()
+	@GlobalSuccessAlert("Resource created successfully!")
+	@ResourceItem(r)
+}
+
+templ ResourceItem(r Resource) {
+	<li id={ r.ID.String() } class="flex justify-between items-center p-2 border rounded">
+		<a href={ templ.URL(r.Url) } class="link link-primary truncate flex-1">{ r.Url }</a>
+		<span class="text-sm text-gray-500 whitespace-nowrap ml-4">{ r.CreatedAt.Format("02-01-2006 15:04:05") }</span>
+	</li>
+}
