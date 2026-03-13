@@ -20,29 +20,27 @@ Readers App aims to be your personal digital library. Instead of just bookmarkin
 
 The primary goal is to create an efficient tool for studying, research, and compiling technical knowledge. By gathering and indexing content, you can easily revisit and connect ideas from various sources, turning a collection of articles into a true personal knowledge base.
 
-### Tasks TO-DO
+## Next steps
 
 #### 1. Server-Side Authentication with Firebase
 
-**Goal:** The client sends email/password to the backend, and the backend communicates with Firebase (not the client).
+Currently the client is sending credentials to firebase via js to generate tokens and authenticate. This should move to the backend and let the server communicate with Firebase.
 
 **Changes:**
-- Install Firebase Admin SDK
-- Remove auth logic in JS (`login.js`, `register.js`)
-- Backend uses `authClient.CreateUser()` and `authClient.VerifyPassword()`
-- Remove token sending from client
-- Improve error handling with global alerts
+- Remove auth logic in JS (`login.js`, `register.js`).
+- Backend uses `Firebase Admin SDK` to handle user creation and token generation.
+- Improve error handling with global alerts.
 
 #### 2. Full-Text Search in PostgreSQL
 
-**Goal:** Search content in saved resources.
+Search content in saved resources. Implement stemming and vectoring to enhance the searching capabilities of the application.
 
 **Changes:**
-- Add `tsvector` column to `resources` table
-- Add `pg_trgm` extension and create GIN index
-- Create trigger to automatically update search vector
-- Add search method to repository
-- Add `/api/resource/search` endpoint
+- Add `tsvector` column to `resources` table.
+- Add `pg_trgm` extension and create GIN index.
+- Create trigger to automatically update search vector.
+- Add search method to repository.
+- Add `/api/resource/search` endpoint.
 
 ---
 
